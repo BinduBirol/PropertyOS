@@ -30,20 +30,17 @@ public class User {
     private String firstName;
     private String lastName;
 
-    // 📱 Contact
+    @Column(unique = true, nullable = false)
     private String phone;
 
     // 🏢 Multi-tenant support (store owner system)
     private Long companyId;
 
-    // 🔐 Roles (SELLER / CUSTOMER / ADMIN)
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "user_roles",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id")
-    )
-    private Set<Role> roles = new HashSet<>();
+    @ElementCollection(fetch = FetchType.EAGER)
+    @Enumerated(EnumType.STRING)
+    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "role")
+    private Set<RoleName> roles = new HashSet<>();
 
     // 🟢 Account status
     private boolean active = true;

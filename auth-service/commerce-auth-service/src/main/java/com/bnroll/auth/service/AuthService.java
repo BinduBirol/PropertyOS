@@ -8,6 +8,7 @@ import com.bnroll.auth.exception.AuthException;
 import com.bnroll.auth.repository.UserRepository;
 import com.bnroll.auth.security.JwtUtil;
 import com.bnroll.commercedomain.entity.user.LocaleCode;
+import com.bnroll.commercedomain.entity.user.RoleName;
 import com.bnroll.commercedomain.entity.user.User;
 import com.bnroll.common.i18n.MessageService;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Locale;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -30,11 +32,20 @@ public class AuthService {
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new AuthException("user.not.found", HttpStatus.NOT_FOUND));
 
+        //String role = user.getRoles().iterator().next().name();
+        /*
+        for (RoleName role: user.getRoles()){
+            if(role == RoleName.valueOf(request.getRole())){
+
+            }
+        }
+         */
+
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new AuthException("invalid.password", HttpStatus.UNAUTHORIZED);
         }
 
-        String role = user.getRoles().iterator().next().getName().name();
+        String role = request.getRole();
 
         long issuedAt = System.currentTimeMillis();
         long expiresIn = 3600_000;
@@ -63,6 +74,9 @@ public class AuthService {
         user.setFirstName(request.getFirstName());
         user.setLastName(request.getLastName());
         user.setPhone(request.getPhone());
+
+        // ✅ assign default role
+        user.setRoles(Set.of(RoleName.CUSTOMER));
 
         return userRepository.save(user);
     }
