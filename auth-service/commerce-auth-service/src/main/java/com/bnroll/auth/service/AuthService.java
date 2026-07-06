@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 
@@ -27,35 +28,36 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
 
-    public LoginResponse login(LoginRequest request) {
+    public LoginResponse login(LoginRequest request, Locale locale) {
 
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new AuthException("user.not.found", HttpStatus.NOT_FOUND));
 
-        //String role = user.getRoles().iterator().next().name();
-        /*
-        for (RoleName role: user.getRoles()){
-            if(role == RoleName.valueOf(request.getRole())){
-
-            }
+        RoleName requestedRole;
+        try {
+            requestedRole = RoleName.valueOf(request.getRole().toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new AuthException("invalid.role", HttpStatus.BAD_REQUEST);
         }
-         */
+
+        if (!user.getRoles().contains(requestedRole)) {
+            throw new AuthException("role.not.assigned", HttpStatus.FORBIDDEN);
+        }
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new AuthException("invalid.password", HttpStatus.UNAUTHORIZED);
         }
 
-        String role = request.getRole();
-
         long issuedAt = System.currentTimeMillis();
-        long expiresIn = 3600_000;
+        long expiresIn = 3600_000L;
         long expiresAt = issuedAt + expiresIn;
 
-        String token = jwtUtil.generateToken(user.getEmail(), role);
+        String token = jwtUtil.generateToken(user.getEmail(), requestedRole.name());
 
         return new LoginResponse(
                 token,
                 "Bearer",
+                requestedRole.name(),
                 issuedAt,
                 expiresAt,
                 expiresIn / 1000
@@ -68,15 +70,20 @@ public class AuthService {
             throw new AuthException("email.already.exists", HttpStatus.CONFLICT);
         }
 
+        RoleName role;
+        try {
+            role = RoleName.valueOf(request.getRole().toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new AuthException("invalid.role", HttpStatus.BAD_REQUEST);
+        }
+
         User user = new User();
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setFirstName(request.getFirstName());
         user.setLastName(request.getLastName());
         user.setPhone(request.getPhone());
-
-        // ✅ assign default role
-        user.setRoles(Set.of(RoleName.CUSTOMER));
+        user.setRoles(Set.of(role));
 
         return userRepository.save(user);
     }

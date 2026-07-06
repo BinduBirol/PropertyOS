@@ -11,18 +11,21 @@ public class LoginResponse {
 
     // 🔐 JWT token
     private String token;
-
     private String tokenType;
+
+    private String role;
 
     // ⏱ token metadata
     private long issuedAt;      // epoch millis
     private long expiresAt;     // epoch millis
     private long expiresIn;     // seconds
 
-    public static LoginResponse of(String token, long issuedAt, long expiresAt) {
+
+    public static LoginResponse of(String token, String role, long issuedAt, long expiresAt) {
         return new LoginResponse(
                 token,
                 "Bearer",
+                role,
                 issuedAt,
                 expiresAt,
                 (expiresAt - issuedAt) / 1000

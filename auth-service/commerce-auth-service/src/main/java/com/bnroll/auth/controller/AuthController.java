@@ -7,10 +7,13 @@ import com.bnroll.auth.security.ratelimit.RateLimit;
 import com.bnroll.auth.service.AuthService;
 import com.bnroll.commercedomain.entity.user.User;
 import com.bnroll.common.dto.response.ApiResponse;
+import com.bnroll.common.i18n.MessageService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.Locale;
 
 @RestController
 @RequiredArgsConstructor
@@ -18,11 +21,13 @@ public class AuthController {
 
     private final AuthService authService;
 
+    private final MessageService messageService;
+
     @PostMapping("/v1/login")
     @RateLimit(limit = 5, durationSeconds = 60)
-    public ApiResponse<LoginResponse> login(@RequestBody LoginRequest request) {
+    public ApiResponse<LoginResponse> login(@Valid @RequestBody LoginRequest request, Locale locale) {
 
-        LoginResponse response = authService.login(request);
+        LoginResponse response = authService.login(request, locale);
 
         return ApiResponse.<LoginResponse>builder()
                 .success(true)
@@ -35,13 +40,13 @@ public class AuthController {
 
     @PostMapping("/v1/register")
     @RateLimit(limit = 5, durationSeconds = 60)
-    public ApiResponse<String> register(@RequestBody RegisterRequest request) {
+    public ApiResponse<String> register(@Valid @RequestBody RegisterRequest request, Locale locale) {
 
         User user = authService.register(request);
 
         return ApiResponse.<String>builder()
                 .success(true)
-                .data("User registered successfully")
+                .data( messageService.get("user.register.success", locale))
                 .timestamp(LocalDateTime.now())
                 .version("v1")
                 .path("/auth/register")

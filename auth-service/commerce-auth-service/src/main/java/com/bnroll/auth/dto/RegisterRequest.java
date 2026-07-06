@@ -8,18 +8,21 @@ import lombok.Setter;
 @Setter
 public class RegisterRequest {
 
-    @NotBlank
+    @NotBlank(message = "{email.required}")
     private String email;
-    @NotBlank
+
+    @NotBlank(message = "{password.required}")
     private String password;
 
-    @NotBlank
+    @NotBlank(message = "{firstName.required}")
     private String firstName;
-    @NotBlank
+
+    @NotBlank(message = "{lastName.required}")
     private String lastName;
-    @NotBlank
+
+    @NotBlank(message = "{phone.required}")
     private String phone;
 
-    @NotBlank
+    @NotBlank(message = "{role.required}")
     private String role;
 }

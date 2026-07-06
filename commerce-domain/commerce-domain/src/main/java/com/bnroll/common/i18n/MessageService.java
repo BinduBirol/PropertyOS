@@ -15,6 +15,14 @@ public class MessageService {
     }
 
     public String get(String key, Locale locale) {
+        if (locale == null) locale = new Locale("bn", "BD");
         return messageSource.getMessage(key, null, locale);
+    }
+
+    public String get(String key, Object[] args, Locale locale) {
+        if (locale == null) {
+            locale = new Locale("bn", "BD");
+        }
+        return messageSource.getMessage(key, args, locale);
     }
 }

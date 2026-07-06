@@ -7,10 +7,12 @@ import lombok.Setter;
 @Getter
 @Setter
 public class LoginRequest {
-    @NotBlank
+    @NotBlank(message = "{email.required}")
     private String email;
-    @NotBlank
+
+    @NotBlank(message = "{password.required}")
     private String password;
-    @NotBlank
+
+    @NotBlank(message = "{role.required}")
     private String role;
 }

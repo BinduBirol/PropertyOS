@@ -6,10 +6,17 @@ import com.bnroll.common.i18n.MessageService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
+import org.springframework.http.HttpStatus;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Locale;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
 @RequiredArgsConstructor
@@ -19,12 +26,13 @@ public class GlobalExceptionHandler {
     @Value("${spring.application.name}")
     private String serviceName;
 
+    private final MessageSource messageSource;
+
     // AUTH ERROR
     @ExceptionHandler(AuthException.class)
     public ApiResponse<?> handleAuthException(AuthException ex,
-                                              HttpServletRequest request) {
+                                              HttpServletRequest request, Locale locale) {
 
-        Locale locale = new Locale("bn", "BD");
 
         return ApiResponse.builder()
                 .success(false)
@@ -41,12 +49,42 @@ public class GlobalExceptionHandler {
     }
 
     // GENERIC ERROR
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ApiResponse<?> handleValidationException(MethodArgumentNotValidException ex, HttpServletRequest request, Locale locale) {
+
+        FieldError error1 = ex.getBindingResult().getFieldErrors().get(0);
+
+        System.out.println("DefaultMessage = " + error1.getDefaultMessage());
+        System.out.println("Codes = " + Arrays.toString(error1.getCodes()));
+        System.out.println("Arguments = " + Arrays.toString(error1.getArguments()));
+
+        Map<String, String> fieldErrors = ex.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .collect(Collectors.toMap(
+                        FieldError::getField,
+                        error -> messageSource.getMessage(error, locale)
+                ));
+
+        return ApiResponse.builder()
+                .success(false)
+                .error(ApiError.builder()
+                        .code("validation.failed")
+                        .message(messageService.get("validation.failed", locale))
+                        .status(ex.getStatusCode().value())
+                        .service(serviceName)
+                        .fieldErrors(fieldErrors)
+                        .build())
+                .timestamp(LocalDateTime.now())
+                .path(request.getRequestURI())
+                .version("v1")
+                .build();
+    }
+
+    // GENERIC ERROR
     @ExceptionHandler(Exception.class)
-    public ApiResponse<?> handleGeneralException(Exception ex, HttpServletRequest request) {
+    public ApiResponse<?> handleGeneralException(Exception ex, HttpServletRequest request, Locale locale) {
 
-        //Locale locale = Locale.ENGLISH;
-
-        Locale locale = new Locale("bn", "BD");
 
         return ApiResponse.builder()
                 .success(false)
@@ -61,10 +99,6 @@ public class GlobalExceptionHandler {
                 .version("v1")
                 .build();
     }
-
-
-
-
 
 
 }
