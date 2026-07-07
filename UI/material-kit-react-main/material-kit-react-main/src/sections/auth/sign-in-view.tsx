@@ -12,17 +12,89 @@ import InputAdornment from '@mui/material/InputAdornment';
 import { useRouter } from 'src/routes/hooks';
 
 import { Iconify } from 'src/components/iconify';
+import { login } from 'src/api/authApi';
+import { useSnackbar } from "notistack";
+import axios from "axios";
+import MenuItem from '@mui/material/MenuItem';
+
+
 
 // ----------------------------------------------------------------------
 
 export function SignInView() {
+
+  const { enqueueSnackbar } = useSnackbar();
+
+  const [identifier, setIdentifier] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [loginType, setLoginType] = useState("EMAIL");
   const router = useRouter();
 
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleSignIn = useCallback(() => {
-    router.push('/');
-  }, [router]);
+  const handleSignIn = useCallback(async () => {
+
+    try {
+
+      setLoading(true);
+
+      const response = await login({
+        identifier,
+        password,
+        role: "CUSTOMER",
+        loginType
+      });
+
+      console.log(response);
+
+      if (!response.success) {
+
+        enqueueSnackbar(
+          response.error?.message ?? "Login failed",
+          {
+            variant: "error",
+          }
+        );
+
+        return;
+      }
+
+      localStorage.setItem(
+        "accessToken",
+        response.data.token
+      );
+
+      router.push("/");
+
+    } catch (error) {
+
+      if (axios.isAxiosError(error)) {
+
+        const apiError = error.response?.data;
+
+        enqueueSnackbar(
+          apiError?.error?.message ?? "Unable to connect to the server.",
+          {
+            variant: "error",
+          }
+        );
+
+      } else {
+
+        enqueueSnackbar("Something went wrong.", {
+          variant: "error",
+        });
+
+      }
+
+    } finally {
+
+      setLoading(false);
+
+    }
+
+  }, [identifier, password, router]);
 
   const renderForm = (
     <Box
@@ -33,25 +105,42 @@ export function SignInView() {
       }}
     >
       <TextField
+        select
         fullWidth
-        name="email"
-        label="Email address"
-        defaultValue="hello@gmail.com"
+        label="Login Type"
+        value={loginType}
+        onChange={(e) => setLoginType(e.target.value)}
+        sx={{ mb: 3 }}
+      >
+        <MenuItem value="EMAIL">Email</MenuItem>
+        <MenuItem value="MOBILE">Mobile Number</MenuItem>
+      </TextField>
+
+      <TextField
+        fullWidth
+        name="identifier"
+        value={identifier}
+        onChange={(e) => setIdentifier(e.target.value)}
+        label={loginType === "EMAIL" ? "Email Address" : "Mobile Number"}
+        placeholder={
+          loginType === "EMAIL"
+            ? "example@gmail.com"
+            : "018XXXXXXXX"
+        }
         sx={{ mb: 3 }}
         slotProps={{
           inputLabel: { shrink: true },
         }}
       />
 
-      <Link variant="body2" color="inherit" sx={{ mb: 1.5 }}>
-        Forgot password?
-      </Link>
+
 
       <TextField
         fullWidth
         name="password"
         label="Password"
-        defaultValue="@demo1234"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
         type={showPassword ? 'text' : 'password'}
         slotProps={{
           inputLabel: { shrink: true },
@@ -68,16 +157,23 @@ export function SignInView() {
         sx={{ mb: 3 }}
       />
 
+      <Link variant="body2" color="inherit" sx={{ mb: 1.5 }}>
+        Forgot password?
+      </Link>
+
       <Button
         fullWidth
         size="large"
-        type="submit"
-        color="inherit"
         variant="contained"
+        color="inherit"
+        disabled={loading}
         onClick={handleSignIn}
       >
-        Sign in
+        {loading ? "Signing in..." : "Sign in"}
       </Button>
+
+
+
     </Box>
   );
 

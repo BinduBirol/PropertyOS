@@ -1,6 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { Outlet, RouterProvider, createBrowserRouter } from 'react-router';
+import { SnackbarProvider } from 'notistack';
 
 import App from './app';
 import { routesSection } from './routes/sections';
@@ -24,6 +25,15 @@ const root = createRoot(document.getElementById('root')!);
 
 root.render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <SnackbarProvider
+      maxSnack={3}
+      autoHideDuration={3000}
+      anchorOrigin={{
+        vertical: 'top',
+        horizontal: 'right',
+      }}
+    >
+      <RouterProvider router={router} />
+    </SnackbarProvider>
   </StrictMode>
 );
