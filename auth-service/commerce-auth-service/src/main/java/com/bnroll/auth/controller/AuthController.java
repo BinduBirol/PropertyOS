@@ -8,6 +8,8 @@ import com.bnroll.auth.service.AuthService;
 import com.bnroll.commercedomain.entity.user.User;
 import com.bnroll.common.dto.response.ApiResponse;
 import com.bnroll.common.i18n.MessageService;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +20,7 @@ import java.util.Locale;
 
 @RestController
 @RequiredArgsConstructor
+@Tag(name = "Authentication", description = "Authentication APIs")
 public class AuthController {
 
     private final AuthService authService;
@@ -39,6 +42,7 @@ public class AuthController {
                 .path(httpRequest.getRequestURI())
                 .build();
     }
+
 
     @PostMapping("/v1/register")
     @RateLimit(limit = 5, durationSeconds = 60)

@@ -50,3 +50,14 @@ logging:
 jwt:
   secret: my-super-secret-key-my-super-secret-key
   expiration: 86400000
+
+
+spring doc:
+  api-docs:
+    path: /api-docs
+
+  swagger-ui:
+    path: /swagger-ui
+    operationsSorter: method
+    tagsSorter: alpha
+    display-request-duration: true
