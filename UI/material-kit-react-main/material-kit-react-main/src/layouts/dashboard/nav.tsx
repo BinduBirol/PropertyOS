@@ -112,7 +112,7 @@ export function NavMobile({
 
 export function NavContent({ data, slots, workspaces, sx }: NavContentProps) {
   const pathname = usePathname();
-     const { t } = useTranslation(); // ✅ add this
+  const { t } = useTranslation(); // ✅ add this
 
   return (
     <>

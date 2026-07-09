@@ -9,11 +9,18 @@ import lombok.Getter;
 @Schema(description = "Login response")
 public class LoginResponse {
 
+
     @Schema(
             description = "JWT access token",
             example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
     )
-    private String token;
+    private String accessToken;
+
+    @Schema(
+            description = "JWT refresh token",
+            example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+    )
+    private String refreshToken;
 
     @Schema(
             description = "Token type",
@@ -46,13 +53,15 @@ public class LoginResponse {
     private long expiresIn;
 
     public static LoginResponse of(
-            String token,
+            String accessToken,
+            String refreshToken,
             String role,
             long issuedAt,
             long expiresAt) {
 
         return new LoginResponse(
-                token,
+                accessToken,
+                refreshToken,
                 "Bearer",
                 role,
                 issuedAt,

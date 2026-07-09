@@ -18,10 +18,11 @@
     "emailVerificationRequired": "Email verification required",
     "emailVerificationDescription": "Your email address has not been verified yet. Please verify your email to continue.",
     "verifyEmail": "Verify Email",
-
+    "sessionExpired": "Your session has expired. Please sign in again.",
     "phoneVerificationRequired": "Phone verification required",
     "phoneVerificationDescription": "Your mobile number has not been verified yet. Please verify your phone number to continue.",
-    "verifyPhone": "Verify Phone"
+    "verifyPhone": "Verify Phone",
+    "checkingAuthentication": "Checking authentication..."
   },
   "business": {
     "add_new": "Add new business",

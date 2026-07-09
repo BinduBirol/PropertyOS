@@ -2,7 +2,9 @@ package com.bnroll.auth.controller;
 
 import com.bnroll.auth.dto.LoginRequest;
 import com.bnroll.auth.dto.LoginResponse;
+import com.bnroll.auth.dto.RefreshTokenRequest;
 import com.bnroll.auth.dto.RegisterRequest;
+import com.bnroll.auth.exception.AuthException;
 import com.bnroll.auth.security.ratelimit.RateLimit;
 import com.bnroll.auth.service.AuthService;
 import com.bnroll.commercedomain.entity.user.User;
@@ -13,6 +15,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -41,6 +46,17 @@ public class AuthController {
                 .version("v1")
                 .path(httpRequest.getRequestURI())
                 .build();
+    }
+
+    @PostMapping("/v1/refresh")
+    public LoginResponse refresh(
+            @Valid @RequestBody RefreshTokenRequest request) {
+        return authService.refresh(request);
+    }
+
+    @GetMapping("/v1/me")
+    public ResponseEntity<?> me(Authentication authentication) {
+        return ResponseEntity.ok().build();
     }
 
 

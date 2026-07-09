@@ -1,4 +1,4 @@
-debug: true
+debug: false
 server:
   port: 8081
   servlet:
@@ -51,11 +51,15 @@ logging:
   level:
     root: INFO
     com.bnroll: DEBUG
-    org.springframework.security: INFO
+    org.springframework.security: DEBUG
 
 jwt:
   secret: my-super-secret-key-my-super-secret-key
-  expiration: 86400000
+  access-token:
+    expiration: 300000
+
+  refresh-token:
+    expiration: 172800000    # 1day
 
 
 spring doc:

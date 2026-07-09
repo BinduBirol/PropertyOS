@@ -3,6 +3,7 @@ package com.bnroll.auth.service;
 
 import com.bnroll.auth.dto.LoginRequest;
 import com.bnroll.auth.dto.LoginResponse;
+import com.bnroll.auth.dto.RefreshTokenRequest;
 import com.bnroll.auth.dto.RegisterRequest;
 import com.bnroll.auth.event.config.KafkaProducer;
 import com.bnroll.auth.event.dto.LoginFailedEvent;
@@ -14,8 +15,10 @@ import com.bnroll.auth.security.JwtUtil;
 import com.bnroll.commercedomain.entity.user.LoginType;
 import com.bnroll.commercedomain.entity.user.RoleName;
 import com.bnroll.commercedomain.entity.user.User;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -34,6 +37,8 @@ public class AuthService {
     private final LoginAttemptService loginAttemptService;
     private final HttpServletRequest httpServletRequest;
     private final KafkaProducer kafkaProducer;
+    @Value("${jwt.access-token.expiration}")
+    private long accessTokenExpiration;
 
     public LoginResponse login(LoginRequest request, Locale locale) {
 
@@ -85,7 +90,7 @@ public class AuthService {
                     HttpStatus.FORBIDDEN
             );
         }
-
+        /*
         if (!user.isVerified()) {
             logFailureAndThrow(
                     user,
@@ -96,6 +101,7 @@ public class AuthService {
                     HttpStatus.FORBIDDEN
             );
         }
+        */
 
         if (!user.isActive()) {
             logFailureAndThrow(
@@ -122,11 +128,15 @@ public class AuthService {
         }
 
         long issuedAt = System.currentTimeMillis();
-        long expiresAt = issuedAt + 3_600_000L;
+        long expiresAt = issuedAt + accessTokenExpiration;
 
-        String token = jwtUtil.generateToken(
+        String accessToken = jwtUtil.generateAccessToken(
                 user.getEmail(),
                 requestedRole.name()
+        );
+
+        String refreshToken = jwtUtil.generateRefreshToken(
+                user.getEmail()
         );
 
         loginAttemptService.log(
@@ -153,7 +163,8 @@ public class AuthService {
         );
 
         return LoginResponse.of(
-                token,
+                accessToken,
+                refreshToken,
                 requestedRole.name(),
                 issuedAt,
                 expiresAt
@@ -234,4 +245,43 @@ public class AuthService {
     }
 
 
+    public LoginResponse refresh(RefreshTokenRequest request) {
+
+
+        String refreshToken = request.getRefreshToken();
+
+        String email = jwtUtil.extractUsername(refreshToken);
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new AuthException("user.not.found", HttpStatus.NOT_FOUND));
+
+
+        if (!jwtUtil.isTokenValid(refreshToken, user.getEmail())) {
+            throw new AuthException("validation.failed", HttpStatus.UNAUTHORIZED);
+        }
+
+        String role = request.getRole();
+
+        System.out.println(role);
+
+        String accessToken = jwtUtil.generateAccessToken(
+                user.getEmail(),
+                role
+        );
+
+        String newRefreshToken = jwtUtil.generateRefreshToken(
+                user.getEmail()
+        );
+
+        long issuedAt = System.currentTimeMillis();
+        long expiresAt = issuedAt + accessTokenExpiration;
+
+        return LoginResponse.of(
+                accessToken,
+                newRefreshToken,
+                role,
+                issuedAt,
+                expiresAt
+        );
+    }
 }

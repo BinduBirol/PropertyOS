@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef  } from 'react';
 
 import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
@@ -24,6 +24,7 @@ import {
   DialogContentText,
   DialogActions
 } from "@mui/material";
+import { useSearchParams } from 'react-router-dom';
 
 
 
@@ -33,6 +34,26 @@ export function SignInView() {
   const { t } = useTranslation();
 
   const { enqueueSnackbar } = useSnackbar();
+  const [searchParams] = useSearchParams();
+
+  const reason = searchParams.get('reason');
+
+  const sessionExpiredShown = useRef(false);
+
+  useEffect(() => {
+    if (reason === 'session_expired' && !sessionExpiredShown.current) {
+      sessionExpiredShown.current = true;
+
+      enqueueSnackbar(
+        t('auth.sessionExpired'),
+        {
+          variant: 'error',
+        }
+      );
+    }
+  }, [reason, enqueueSnackbar, t]);
+
+
 
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
@@ -86,10 +107,15 @@ export function SignInView() {
         }
       }
 
-      localStorage.setItem(
-        "accessToken",
-        response.data.token
-      );
+      const {
+        accessToken,
+        refreshToken,
+        role,
+      } = response.data;
+
+      localStorage.setItem("accessToken", accessToken);
+      localStorage.setItem("refreshToken", refreshToken);
+      localStorage.setItem("role", role);
 
       router.push("/");
 
