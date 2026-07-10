@@ -30,19 +30,14 @@ The project follows a production-oriented approach with independent services com
 ```text
 commerce-parent
 │
-├── commerce-common
-│   ├── Common API response
-│   ├── Global exception handling
-│   ├── i18n
-│   ├── Utilities
-│   ├── Security helpers
-│   └── Shared annotations
 │
 ├── commerce-domain
 │   ├── Shared entities
 │   ├── BaseEntity
 │   ├── Common enums
 │   └── Shared domain models
+│   ├── Common API response
+│   └── Shared annotations
 │
 ├── commerce-auth-service
 │   ├── Authentication
