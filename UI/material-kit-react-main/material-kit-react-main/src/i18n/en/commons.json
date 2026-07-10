@@ -12,7 +12,6 @@
     "mobileNumber": "Mobile Number",
     "mobilePlaceholder": "018XXXXXXXX",
     "password": "Password",
-    "forgotPassword": "Forgot password?",
     "noAccount": "Don't have an account?",
     "getStarted": "Get started",
     "emailVerificationRequired": "Email verification required",
@@ -23,7 +22,20 @@
     "phoneVerificationDescription": "Your mobile number has not been verified yet. Please verify your phone number to continue.",
     "verifyPhone": "Verify Phone",
     "checkingAuthentication": "Checking authentication...",
-    "loggedOut": "You have been logged out."
+    "loggedOut": "You have been logged out.",
+    "forgotPassword": {
+      "title": "Forgot Password",
+      "description": "Enter your email address or mobile number and we'll send you instructions to reset your password.",
+      "loginType": "Login Type",
+      "email": "Email",
+      "phone": "Phone",
+      "emailPlaceholder": "Enter your email address",
+      "phonePlaceholder": "Enter your mobile number",
+      "sendResetLink": "Send Reset Link",
+      "sendOtp": "Send OTP",
+      "backToSignIn": "Back to Sign In",
+      "info": "You will receive a password reset link or a one-time password (OTP) depending on the selected login method."
+    }
   },
   "business": {
     "add_new": "Add new business",

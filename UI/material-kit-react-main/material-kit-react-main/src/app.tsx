@@ -2,7 +2,7 @@ import './fonts.css';
 import './global.css';
 
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 import Fab from '@mui/material/Fab';
 
@@ -11,6 +11,9 @@ import { usePathname } from 'src/routes/hooks';
 import { ThemeProvider } from 'src/theme/theme-provider';
 
 import { Iconify } from 'src/components/iconify';
+import Box from 'node_modules/@mui/material/Box/Box.mjs';
+import { ThemePopover } from './layouts/components/theme-popover';
+
 
 // ----------------------------------------------------------------------
 
@@ -39,6 +42,30 @@ export default function App({ children }: AppProps) {
       <Iconify width={24} icon="socials:github" sx={{ '--color': 'white' }} />
     </Fab>
   );
+type ThemeMode = 'light' | 'dark' | 'system';
+const [mode, setMode] = useState<ThemeMode>('system');
+
+
+const themeButton = () => (
+  <ThemePopover
+    mode={mode}
+    setMode={setMode}
+    iconButtonProps={{
+      sx: {
+        zIndex: 9,
+        right: 20,
+        bottom: 20,
+        width: 48,
+        height: 48,
+        position: 'fixed',
+        bgcolor: 'background.paper',
+        boxShadow: 3,
+      },
+    }}
+  />
+);
+
+
 
   return (
     <ThemeProvider>

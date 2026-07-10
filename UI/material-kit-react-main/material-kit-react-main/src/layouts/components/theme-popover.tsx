@@ -8,6 +8,7 @@ import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 import MenuItem, { menuItemClasses } from '@mui/material/MenuItem';
 import ContrastIcon from '@mui/icons-material/Contrast';
+import type { IconButtonProps } from '@mui/material/IconButton';
 
 type ThemeMode = 'light' | 'dark' | 'system';
 
@@ -25,12 +26,16 @@ function resolveTheme(mode: ThemeMode): 'light' | 'dark' {
     return mode;
 }
 
+
+
 export function ThemePopover({
     setMode,
     mode,
+    iconButtonProps,
 }: {
     mode: ThemeMode;
     setMode: (mode: ThemeMode) => void;
+    iconButtonProps?: IconButtonProps;
 }) {
     const { open, anchorEl, onClose, onOpen } = usePopover();
 

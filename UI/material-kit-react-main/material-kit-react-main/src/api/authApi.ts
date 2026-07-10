@@ -39,7 +39,10 @@ export function logout(refreshToken: string) {
   return api.post('/v1/logout', {
     refreshToken,
   });
+  
 }
+
+
 
 export function logoutAll(refreshToken: string) {
   return api.post('/v1/logout/all', {

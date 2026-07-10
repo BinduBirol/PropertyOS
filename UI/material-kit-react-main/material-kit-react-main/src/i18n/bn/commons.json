@@ -12,7 +12,6 @@
     "mobileNumber": "মোবাইল নম্বর",
     "mobilePlaceholder": "০১৮XXXXXXXX",
     "password": "পাসওয়ার্ড",
-    "forgotPassword": "পাসওয়ার্ড ভুলে গেছেন?",
     "noAccount": "অ্যাকাউন্ট নেই?",
     "getStarted": "শুরু করুন",
     "emailVerificationRequired": "ইমেইল যাচাইকরণ প্রয়োজন",
@@ -23,7 +22,20 @@
     "phoneVerificationDescription": "আপনার মোবাইল নম্বরটি এখনও যাচাই করা হয়নি। চালিয়ে যেতে অনুগ্রহ করে আপনার মোবাইল নম্বর যাচাই করুন।",
     "verifyPhone": "মোবাইল নম্বর যাচাই করুন",
     "checkingAuthentication": "অথেনটিকেশন যাচাই করা হচ্ছে...",
-    "loggedOut": "আপনি লগ আউট হয়েছেন।"
+    "loggedOut": "আপনি লগ আউট হয়েছেন।",
+    "forgotPassword": {
+      "title": "পাসওয়ার্ড ভুলে গেছেন",
+      "description": "আপনার ইমেইল ঠিকানা বা মোবাইল নম্বর লিখুন এবং আপনার পাসওয়ার্ড রিসেট করতে নির্দেশাবলী পাঠানো হবে।",
+      "loginType": "লগইন পদ্ধতি",
+      "email": "ইমেইল",
+      "phone": "মোবাইল",
+      "emailPlaceholder": "আপনার ইমেইল ঠিকানা লিখুন",
+      "phonePlaceholder": "আপনার মোবাইল নম্বর লিখুন",
+      "sendResetLink": "Reset Link পাঠান",
+      "sendOtp": "OTP পাঠান",
+      "backToSignIn": "সাইন ইনে ফিরে যান",
+      "info": "আপনি নির্বাচিত লগইন পদ্ধতির উপর ভিত্তি করে একটি পাসওয়ার্ড রিসেট লিঙ্ক বা একবারের জন্যে (OTP) পাবেন।"
+    }
 
   },
   "business": {

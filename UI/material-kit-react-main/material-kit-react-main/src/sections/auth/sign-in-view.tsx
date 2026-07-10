@@ -27,6 +27,7 @@ import {
 import { useSearchParams } from 'react-router-dom';
 import { useAuth } from 'src/auth/AuthContext';
 import { authStorage } from '../../auth/authStorage';
+import { RouterLink } from 'src/routes/components/router-link';
 
 
 
@@ -247,8 +248,8 @@ export function SignInView() {
         sx={{ mb: 3 }}
       />
 
-      <Link variant="body2" color="inherit" sx={{ mb: 1.5 }}>
-        {t('auth.forgotPassword')}
+      <Link variant="body2" color="inherit" sx={{ mb: 1.5 }} component={RouterLink} href="/forgot-password">
+        {t('auth.forgotPassword.title')}
       </Link>
 
       <Button
