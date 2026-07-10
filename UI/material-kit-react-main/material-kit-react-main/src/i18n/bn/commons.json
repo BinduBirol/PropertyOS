@@ -22,7 +22,8 @@
     "phoneVerificationRequired": "মোবাইল নম্বর যাচাইকরণ প্রয়োজন",
     "phoneVerificationDescription": "আপনার মোবাইল নম্বরটি এখনও যাচাই করা হয়নি। চালিয়ে যেতে অনুগ্রহ করে আপনার মোবাইল নম্বর যাচাই করুন।",
     "verifyPhone": "মোবাইল নম্বর যাচাই করুন",
-    "checkingAuthentication": "অথেনটিকেশন যাচাই করা হচ্ছে..."
+    "checkingAuthentication": "অথেনটিকেশন যাচাই করা হচ্ছে...",
+    "loggedOut": "আপনি লগ আউট হয়েছেন।"
 
   },
   "business": {
@@ -46,6 +47,9 @@
     "product": "প্রোডাক্ট",
     "blog": "ব্লগ",
     "signIn": "সাইন ইন",
-    "notFound": "পাওয়া যায়নি"
+    "notFound": "পাওয়া যায়নি",
+    "profile": "প্রোফাইল",
+    "settings": "সেটিংস",
+    "home": "হোম"
   }
 }

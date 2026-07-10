@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef  } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 
 import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
@@ -25,6 +25,9 @@ import {
   DialogActions
 } from "@mui/material";
 import { useSearchParams } from 'react-router-dom';
+import { useAuth } from 'src/auth/AuthContext';
+import { authStorage } from '../../auth/authStorage';
+
 
 
 
@@ -51,6 +54,17 @@ export function SignInView() {
         }
       );
     }
+
+    if (reason === 'logged_out' && !sessionExpiredShown.current) {
+      sessionExpiredShown.current = true;
+
+      enqueueSnackbar(
+        t('auth.loggedOut'),
+        {
+          variant: 'error',
+        }
+      );
+    }
   }, [reason, enqueueSnackbar, t]);
 
 
@@ -67,6 +81,8 @@ export function SignInView() {
 
   const [showPassword, setShowPassword] = useState(false);
 
+  const auth = useAuth();
+
   const handleSignIn = useCallback(async () => {
 
     try {
@@ -80,7 +96,7 @@ export function SignInView() {
         loginType
       });
 
-      console.log(response);
+      //console.log(response);
 
       if (!response.success) {
 
@@ -113,9 +129,15 @@ export function SignInView() {
         role,
       } = response.data;
 
-      localStorage.setItem("accessToken", accessToken);
-      localStorage.setItem("refreshToken", refreshToken);
-      localStorage.setItem("role", role);
+      authStorage.saveTokens(
+        accessToken,
+        refreshToken,
+        role
+      );
+
+      await auth.login();
+
+      await auth.refreshUser();
 
       router.push("/");
 
@@ -156,6 +178,7 @@ export function SignInView() {
     router,
     enqueueSnackbar,
     t,
+    auth,
   ]);
   const renderForm = (
     <Box

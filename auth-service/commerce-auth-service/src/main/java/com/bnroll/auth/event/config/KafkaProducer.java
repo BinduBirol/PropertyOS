@@ -1,8 +1,6 @@
 package com.bnroll.auth.event.config;
 
-import com.bnroll.auth.event.dto.LoginFailedEvent;
-import com.bnroll.auth.event.dto.LoginSuccessEvent;
-import com.bnroll.auth.event.dto.UserRegisteredEvent;
+import com.bnroll.auth.event.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
@@ -10,9 +8,9 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class KafkaProducer {
-
     private final KafkaTemplate<String, Object> kafkaTemplate;
-
+    private static final String PASSWORD_RESET_REQUEST_TOPIC = "password-reset-requested";
+    private static final String PASSWORD_RESET_SUCCESS_TOPIC = "password-success-requested";
     private static final String USER_REGISTERED_TOPIC = "user-registered";
     private static final String LOGIN_FAILED_TOPIC = "login-failed";
     private static final String LOGIN_SUCCESS_TOPIC = "login-success";
@@ -43,6 +41,26 @@ public class KafkaProducer {
         kafkaTemplate.send(
                 LOGIN_SUCCESS_TOPIC,
                 event.userId().toString(),
+                event
+        );
+    }
+
+    public void sendPasswordResetRequestedEvent(
+            PasswordResetRequestedEvent event) {
+
+        kafkaTemplate.send(
+                PASSWORD_RESET_REQUEST_TOPIC,
+                event.email(),
+                event
+        );
+    }
+
+    public void sendPasswordResetSuccessEvent(
+            PasswordResetSuccessEvent event) {
+
+        kafkaTemplate.send(
+                PASSWORD_RESET_SUCCESS_TOPIC,
+                event.email(),
                 event
         );
     }

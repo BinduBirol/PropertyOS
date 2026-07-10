@@ -17,6 +17,8 @@ import { useRouter, usePathname } from 'src/routes/hooks';
 import { _myAccount } from 'src/_mock';
 
 import { useTranslation } from 'react-i18next';
+import { useLogout } from 'src/auth/useLogout';
+import { useAuth } from 'src/auth/AuthContext';
 
 // ----------------------------------------------------------------------
 
@@ -32,7 +34,11 @@ export type AccountPopoverProps = IconButtonProps & {
 export function AccountPopover({ data = [], sx, ...other }: AccountPopoverProps) {
   const router = useRouter();
 
-    const { t } = useTranslation();
+  const { user } = useAuth();
+
+  const { t } = useTranslation();
+
+  const logout = useLogout();
 
   const pathname = usePathname();
 
@@ -87,11 +93,15 @@ export function AccountPopover({ data = [], sx, ...other }: AccountPopoverProps)
       >
         <Box sx={{ p: 2, pb: 1.5 }}>
           <Typography variant="subtitle2" noWrap>
-            {_myAccount?.displayName}
+            {user?.firstName} {user?.lastName}
           </Typography>
 
-          <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-            {_myAccount?.email}
+          <Typography
+            variant="body2"
+            sx={{ color: "text.secondary" }}
+            noWrap
+          >
+            {user?.email}
           </Typography>
         </Box>
 
@@ -133,7 +143,7 @@ export function AccountPopover({ data = [], sx, ...other }: AccountPopoverProps)
         <Divider sx={{ borderStyle: 'dashed' }} />
 
         <Box sx={{ p: 1 }}>
-          <Button fullWidth color="error" size="medium" variant="text">
+          <Button onClick={logout} fullWidth color="error" size="medium" variant="text">
             {t('auth.logout')}
           </Button>
         </Box>

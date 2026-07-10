@@ -12,7 +12,7 @@ import { _langs, _notifications } from 'src/_mock';
 
 import { NavMobile, NavDesktop } from './nav';
 import { layoutClasses } from '../core/classes';
-import { _account } from '../nav-config-account';
+import { useAccountMenu  } from '../nav-config-account';
 import { dashboardLayoutVars } from './css-vars';
 import { navData } from '../nav-config-dashboard';
 import { MainSection } from '../core/main-section';
@@ -65,6 +65,7 @@ export function DashboardLayout({
   const loading = useRouteLoading();
 
   const { t } = useTranslation();
+  const accountMenu = useAccountMenu();
 
   const renderHeader = () => {
     const headerSlotProps: HeaderSectionProps['slotProps'] = {
@@ -97,7 +98,7 @@ export function DashboardLayout({
 
           <LanguagePopover data={_langs} />
           <NotificationsPopover data={_notifications} />
-          <AccountPopover data={_account} />
+          <AccountPopover data={accountMenu} />
         </Box>
       ),
     };

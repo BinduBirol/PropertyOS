@@ -61,6 +61,9 @@ jwt:
   refresh-token:
     expiration: 172800000    # 1day
 
+  password-reset-token:
+    expiration: 900000          # 15 minutes
+
 
 spring doc:
   api-docs:
@@ -71,3 +74,6 @@ spring doc:
     operationsSorter: method
     tagsSorter: alpha
     display-request-duration: true
+password:
+  token:
+    expiration: 300000

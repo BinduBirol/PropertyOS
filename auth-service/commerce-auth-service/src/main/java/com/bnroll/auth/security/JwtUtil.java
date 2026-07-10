@@ -1,12 +1,14 @@
 package com.bnroll.auth.security;
 
 import io.jsonwebtoken.*;
+import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Date;
+import java.util.Map;
 
 @Component
 public class JwtUtil {
@@ -19,6 +21,9 @@ public class JwtUtil {
 
     @Value("${jwt.refresh-token.expiration}")
     private long refreshTokenExpiration;
+
+    @Value("${password.token.expiration}")
+    private long passwordResetTokenExpiration;
 
     private Key getKey() {
         return Keys.hmacShaKeyFor(secret.getBytes());
@@ -74,4 +79,22 @@ public class JwtUtil {
     }
 
 
+    public String generatePasswordResetToken(String email) {
+
+
+        return Jwts.builder()
+                .subject(email)
+                .claim("type", "PASSWORD_RESET")
+                .issuedAt(new Date())
+                .expiration(new Date(
+                        System.currentTimeMillis() + passwordResetTokenExpiration
+                ))
+                .signWith(getSigningKey())
+                .compact();
+    }
+
+    private Key getSigningKey() {
+        byte[] keyBytes = Decoders.BASE64.decode(secret);
+        return Keys.hmacShaKeyFor(keyBytes);
+    }
 }

@@ -71,4 +71,12 @@ public class JwtService {
         return newRefreshToken;
     }
 
+    @Transactional
+    public void revokeAllSessions(User user) {
+
+        refreshTokenRepository.revokeAllByUserId(
+                user.getId(),
+                Instant.now()
+        );
+    }
 }

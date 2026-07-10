@@ -6,6 +6,7 @@ import { SnackbarProvider } from 'notistack';
 import App from './app';
 import { routesSection } from './routes/sections';
 import { ErrorBoundary } from './routes/components';
+import { AuthProvider } from './auth/AuthContext';
 
 // ----------------------------------------------------------------------
 
@@ -33,7 +34,9 @@ root.render(
         horizontal: 'right',
       }}
     >
-      <RouterProvider router={router} />
+      <AuthProvider>
+        <RouterProvider router={router} />
+      </AuthProvider>
     </SnackbarProvider>
   </StrictMode>
 );

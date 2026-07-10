@@ -1,25 +1,24 @@
 package com.bnroll.auth.service;
 
 
-import com.bnroll.auth.dto.LoginRequest;
-import com.bnroll.auth.dto.LoginResponse;
-import com.bnroll.auth.dto.RefreshTokenRequest;
-import com.bnroll.auth.dto.RegisterRequest;
+import com.bnroll.auth.dto.*;
+import com.bnroll.auth.dto.forgetpassword.ForgotPasswordRequest;
+import com.bnroll.auth.dto.forgetpassword.ResetPasswordRequest;
 import com.bnroll.auth.event.config.KafkaProducer;
-import com.bnroll.auth.event.dto.LoginFailedEvent;
-import com.bnroll.auth.event.dto.LoginSuccessEvent;
-import com.bnroll.auth.event.dto.UserRegisteredEvent;
+import com.bnroll.auth.event.dto.*;
 import com.bnroll.auth.exception.AuthException;
 import com.bnroll.auth.repository.RefreshTokenRepository;
 import com.bnroll.auth.repository.UserRepository;
 import com.bnroll.auth.security.JwtUtil;
 import com.bnroll.auth.util.AuthUtil;
 import com.bnroll.commercedomain.entity.auth.RefreshToken;
+import com.bnroll.commercedomain.entity.password.PasswordResetToken;
 import com.bnroll.commercedomain.entity.user.LoginType;
 import com.bnroll.commercedomain.entity.user.RoleName;
 import com.bnroll.commercedomain.entity.user.User;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -44,9 +43,12 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final AuthUtil authUtil;
     private final JwtService jwtService;
+
+    private final PasswordResetService passwordResetService;
     private final LoginAttemptService loginAttemptService;
     private final HttpServletRequest httpServletRequest;
     private final KafkaProducer kafkaProducer;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     @Value("${jwt.access-token.expiration}")
     private long accessTokenExpiration;
@@ -153,8 +155,10 @@ public class AuthService {
     @Transactional
     public LoginResponse refresh(RefreshTokenRequest request) {
 
+
         RefreshToken storedToken =
                 authUtil.validateRefreshToken(request.getRefreshToken());
+
 
         User user = storedToken.getUser();
 
@@ -205,5 +209,81 @@ public class AuthService {
         );
 
         throw new AuthException(reason, status);
+    }
+
+    @Transactional
+    public void logout(LogoutRequest request) {
+
+        RefreshToken storedToken =
+                authUtil.validateRefreshToken(request.getRefreshToken());
+
+        storedToken.setRevoked(true);
+        storedToken.setRevokedAt(Instant.now());
+
+        refreshTokenRepository.save(storedToken);
+    }
+
+    @Transactional
+    public void logoutAll(LogoutRequest request) {
+
+        RefreshToken storedToken =
+                authUtil.validateRefreshToken(request.getRefreshToken());
+
+        jwtService.revokeAllSessions(storedToken.getUser());
+
+    }
+
+    @Transactional
+    public void forgotPassword(ForgotPasswordRequest request) {
+
+        LoginType loginType =
+                authUtil.parseLoginType(request.getLoginType());
+
+        User user = authUtil.findUser(
+                request.getIdentifier(),
+                loginType
+        );
+
+        if (user == null) {
+            return ;
+        }
+
+        String token = passwordResetService.createPasswordResetToken(user);
+
+        kafkaProducer.sendPasswordResetRequestedEvent(
+                new PasswordResetRequestedEvent(
+                        user.getId(),
+                        user.getEmail(),
+                        user.getPhone(),
+                        loginType,
+                        token,
+                        LocalDateTime.now()
+                )
+        );
+    }
+
+    @Transactional
+    public void resetPassword(ResetPasswordRequest request) {
+
+        PasswordResetToken resetToken =
+                authUtil.validatePasswordResetToken(request.getToken());
+
+        User user = resetToken.getUser();
+
+        user.setPassword(
+                passwordEncoder.encode(request.getPassword())
+        );
+
+        passwordResetService.markAsUsed(resetToken);
+        jwtService.revokeAllSessions(user);
+
+        kafkaProducer.sendPasswordResetSuccessEvent(
+                new PasswordResetSuccessEvent(
+                        user.getId(),
+                        user.getEmail(),
+                        user.getPhone(),
+                        LocalDateTime.now()
+                )
+        );
     }
 }

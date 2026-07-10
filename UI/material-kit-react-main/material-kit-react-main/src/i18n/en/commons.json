@@ -22,7 +22,8 @@
     "phoneVerificationRequired": "Phone verification required",
     "phoneVerificationDescription": "Your mobile number has not been verified yet. Please verify your phone number to continue.",
     "verifyPhone": "Verify Phone",
-    "checkingAuthentication": "Checking authentication..."
+    "checkingAuthentication": "Checking authentication...",
+    "loggedOut": "You have been logged out."
   },
   "business": {
     "add_new": "Add new business",
@@ -45,6 +46,9 @@
     "product": "Product",
     "blog": "Blog",
     "signIn": "Sign in",
-    "notFound": "Not found"
+    "notFound": "Not found",
+    "profile": "Profile",
+    "settings": "Settings",
+    "home": "Home"
   }
 }

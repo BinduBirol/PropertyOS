@@ -1,9 +1,8 @@
 package com.bnroll.auth.controller;
 
-import com.bnroll.auth.dto.LoginRequest;
-import com.bnroll.auth.dto.LoginResponse;
-import com.bnroll.auth.dto.RefreshTokenRequest;
-import com.bnroll.auth.dto.RegisterRequest;
+import com.bnroll.auth.dto.*;
+import com.bnroll.auth.dto.forgetpassword.ForgotPasswordRequest;
+import com.bnroll.auth.dto.forgetpassword.ResetPasswordRequest;
 import com.bnroll.auth.exception.AuthException;
 import com.bnroll.auth.security.ratelimit.RateLimit;
 import com.bnroll.auth.service.AuthService;
@@ -55,8 +54,20 @@ public class AuthController {
     }
 
     @GetMapping("/v1/me")
-    public ResponseEntity<?> me(Authentication authentication) {
-        return ResponseEntity.ok().build();
+    public ResponseEntity<MeResponse> me(Authentication authentication) {
+
+        User user = (User) authentication.getPrincipal();
+
+        return ResponseEntity.ok(
+                new MeResponse(
+                        user.getId(),
+                        user.getFirstName(),
+                        user.getLastName(),
+                        user.getEmail(),
+                        user.getPhone(),
+                        user.getRoles()
+                )
+        );
     }
 
 
@@ -75,5 +86,33 @@ public class AuthController {
                 .path(httpRequest.getRequestURI())
                 .correlationId(String.valueOf(user.getId()))
                 .build();
+    }
+
+    @PostMapping("/v1/logout")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void logout(@RequestBody @Valid LogoutRequest request) {
+        authService.logout(request);
+    }
+
+    @PostMapping("/v1/logout/all")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void logoutAll(@RequestBody @Valid LogoutRequest request) {
+        authService.logoutAll(request);
+    }
+
+    @PostMapping("/v1/forgot-password")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void forgotPassword(
+            @RequestBody @Valid ForgotPasswordRequest request) {
+
+        authService.forgotPassword(request);
+    }
+
+    @PostMapping("/v1/reset-password")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void resetPassword(
+            @RequestBody @Valid ResetPasswordRequest request) {
+
+        authService.resetPassword(request);
     }
 }
