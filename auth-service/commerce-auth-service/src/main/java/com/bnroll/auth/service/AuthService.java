@@ -10,22 +10,31 @@ import com.bnroll.auth.event.dto.LoginFailedEvent;
 import com.bnroll.auth.event.dto.LoginSuccessEvent;
 import com.bnroll.auth.event.dto.UserRegisteredEvent;
 import com.bnroll.auth.exception.AuthException;
+import com.bnroll.auth.repository.RefreshTokenRepository;
 import com.bnroll.auth.repository.UserRepository;
 import com.bnroll.auth.security.JwtUtil;
+import com.bnroll.auth.util.AuthUtil;
+import com.bnroll.commercedomain.entity.auth.RefreshToken;
 import com.bnroll.commercedomain.entity.user.LoginType;
 import com.bnroll.commercedomain.entity.user.RoleName;
 import com.bnroll.commercedomain.entity.user.User;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+
+import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Locale;
 import java.util.Set;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -33,117 +42,52 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final JwtUtil jwtUtil;
+    private final AuthUtil authUtil;
+    private final JwtService jwtService;
     private final LoginAttemptService loginAttemptService;
     private final HttpServletRequest httpServletRequest;
     private final KafkaProducer kafkaProducer;
+
     @Value("${jwt.access-token.expiration}")
     private long accessTokenExpiration;
 
-    public LoginResponse login(LoginRequest request, Locale locale) {
+    @Transactional
+    public LoginResponse login(LoginRequest request) {
 
-        LoginType loginType;
+        LoginType loginType = authUtil.parseLoginType(request.getLoginType());
+        User user = authUtil.findUser(request, loginType);
+        RoleName role = authUtil.parseRole(request.getRole());
+
         try {
-            loginType = LoginType.valueOf(request.getLoginType().toUpperCase());
-        } catch (IllegalArgumentException | NullPointerException e) {
-            throw new AuthException("loginType.invalid", HttpStatus.BAD_REQUEST);
-        }
+            authUtil.validateRole(user, role);
+            authUtil.validateUserStatus(user, loginType);
 
-        RoleName requestedRole;
-        try {
-            requestedRole = RoleName.valueOf(request.getRole().toUpperCase());
-        } catch (IllegalArgumentException | NullPointerException e) {
-            throw new AuthException("invalid.role", HttpStatus.BAD_REQUEST);
-        }
-
-        User user = null;
-        String notVerifiedMessage = "";
-
-        switch (loginType) {
-
-            case EMAIL -> {
-                user = userRepository.findByEmail(request.getIdentifier())
-                        .orElseThrow(() -> new AuthException("user.not.found", HttpStatus.NOT_FOUND));
-
-                notVerifiedMessage = "mail.not.verified";
+            if (loginType != LoginType.GOOGLE) {
+                authUtil.validatePassword(user, request.getPassword());
             }
 
-            case MOBILE -> {
-                user = userRepository.findByPhone(request.getIdentifier())
-                        .orElseThrow(() -> new AuthException("user.not.found", HttpStatus.NOT_FOUND));
-
-                notVerifiedMessage = "phone.not.verified";
-            }
-
-            case GOOGLE -> {
-                throw new UnsupportedOperationException("Google login is not implemented yet.");
-            }
-        }
-
-        if (!user.getRoles().contains(requestedRole)) {
-            logFailureAndThrow(
-                    user,
-                    request,
-                    loginType,
-                    requestedRole,
-                    "role.not.assigned",
-                    HttpStatus.FORBIDDEN
-            );
-        }
-        /*
-        if (!user.isVerified()) {
-            logFailureAndThrow(
-                    user,
-                    request,
-                    loginType,
-                    requestedRole,
-                    notVerifiedMessage,
-                    HttpStatus.FORBIDDEN
-            );
-        }
-        */
-
-        if (!user.isActive()) {
-            logFailureAndThrow(
-                    user,
-                    request,
-                    loginType,
-                    requestedRole,
-                    "user.inactive",
-                    HttpStatus.FORBIDDEN
-            );
-        }
-
-        if (loginType != LoginType.GOOGLE &&
-                !passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+        } catch (AuthException ex) {
 
             logFailureAndThrow(
                     user,
                     request,
                     loginType,
-                    requestedRole,
-                    "invalid.password",
-                    HttpStatus.UNAUTHORIZED
+                    role,
+                    ex.getMessage(),
+                    ex.getStatus()
             );
         }
+
+        String accessToken = jwtService.createAccessToken(user, role);
+        String refreshToken = jwtService.createRefreshToken(user);
 
         long issuedAt = System.currentTimeMillis();
-        long expiresAt = issuedAt + accessTokenExpiration;
-
-        String accessToken = jwtUtil.generateAccessToken(
-                user.getEmail(),
-                requestedRole.name()
-        );
-
-        String refreshToken = jwtUtil.generateRefreshToken(
-                user.getEmail()
-        );
 
         loginAttemptService.log(
                 user,
                 request.getIdentifier(),
                 loginType,
-                requestedRole,
+                role,
                 true,
                 null,
                 httpServletRequest
@@ -165,46 +109,13 @@ public class AuthService {
         return LoginResponse.of(
                 accessToken,
                 refreshToken,
-                requestedRole.name(),
+                role.name(),
                 issuedAt,
-                expiresAt
+                issuedAt + accessTokenExpiration
         );
     }
 
-    private void logFailureAndThrow(
-            User user,
-            LoginRequest request,
-            LoginType loginType,
-            RoleName role,
-            String reason,
-            HttpStatus status) {
-
-        loginAttemptService.log(
-                user,
-                request.getIdentifier(),
-                loginType,
-                role,
-                false,
-                reason,
-                httpServletRequest
-        );
-
-        if (user != null) {
-            kafkaProducer.sendLoginFailedEvent(
-                    new LoginFailedEvent(
-                            request.getIdentifier(),
-                            loginType,
-                            httpServletRequest.getRemoteAddr(),
-                            httpServletRequest.getHeader("User-Agent"),
-                            reason,
-                            LocalDateTime.now()
-                    )
-            );
-        }
-
-        throw new AuthException(reason, status);
-    }
-
+    @Transactional
     public User register(RegisterRequest request) {
 
         if (userRepository.existsByEmail(request.getEmail())) {
@@ -215,12 +126,7 @@ public class AuthService {
             throw new AuthException("phone.already.exists", HttpStatus.CONFLICT);
         }
 
-        RoleName role;
-        try {
-            role = RoleName.valueOf(request.getRole().toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new AuthException("invalid.role", HttpStatus.BAD_REQUEST);
-        }
+        RoleName role = authUtil.parseRole(request.getRole());
 
         User user = new User();
         user.setEmail(request.getEmail());
@@ -244,44 +150,60 @@ public class AuthService {
         return savedUser;
     }
 
-
+    @Transactional
     public LoginResponse refresh(RefreshTokenRequest request) {
 
+        RefreshToken storedToken =
+                authUtil.validateRefreshToken(request.getRefreshToken());
 
-        String refreshToken = request.getRefreshToken();
+        User user = storedToken.getUser();
 
-        String email = jwtUtil.extractUsername(refreshToken);
+        RoleName role = authUtil.parseRole(request.getRole());
+        authUtil.validateRole(user, role);
 
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new AuthException("user.not.found", HttpStatus.NOT_FOUND));
-
-
-        if (!jwtUtil.isTokenValid(refreshToken, user.getEmail())) {
-            throw new AuthException("validation.failed", HttpStatus.UNAUTHORIZED);
-        }
-
-        String role = request.getRole();
-
-        System.out.println(role);
-
-        String accessToken = jwtUtil.generateAccessToken(
-                user.getEmail(),
-                role
-        );
-
-        String newRefreshToken = jwtUtil.generateRefreshToken(
-                user.getEmail()
-        );
+        String accessToken = jwtService.createAccessToken(user, role);
+        String refreshToken = jwtService.rotateRefreshToken(storedToken);
 
         long issuedAt = System.currentTimeMillis();
-        long expiresAt = issuedAt + accessTokenExpiration;
 
         return LoginResponse.of(
                 accessToken,
-                newRefreshToken,
-                role,
+                refreshToken,
+                role.name(),
                 issuedAt,
-                expiresAt
+                issuedAt + accessTokenExpiration
         );
+    }
+
+    private void logFailureAndThrow(
+            User user,
+            LoginRequest request,
+            LoginType loginType,
+            RoleName role,
+            String reason,
+            HttpStatus status) {
+
+        loginAttemptService.log(
+                user,
+                request.getIdentifier(),
+                loginType,
+                role,
+                false,
+                reason,
+                httpServletRequest
+        );
+
+        kafkaProducer.sendLoginFailedEvent(
+                new LoginFailedEvent(
+                        request.getIdentifier(),
+                        loginType,
+                        httpServletRequest.getRemoteAddr(),
+                        httpServletRequest.getHeader("User-Agent"),
+                        reason,
+                        LocalDateTime.now()
+                )
+        );
+
+        throw new AuthException(reason, status);
     }
 }

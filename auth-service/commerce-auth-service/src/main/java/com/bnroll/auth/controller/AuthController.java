@@ -37,7 +37,7 @@ public class AuthController {
     public ApiResponse<LoginResponse> login(@Valid @RequestBody LoginRequest request, Locale locale,
                                             HttpServletRequest httpRequest) {
 
-        LoginResponse response = authService.login(request, locale);
+        LoginResponse response = authService.login(request);
 
         return ApiResponse.<LoginResponse>builder()
                 .success(true)
