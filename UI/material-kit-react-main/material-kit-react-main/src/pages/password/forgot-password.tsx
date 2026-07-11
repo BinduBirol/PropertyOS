@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+
+
 import {
     Box,
     Button,
@@ -12,16 +14,75 @@ import {
 } from '@mui/material';
 
 import { RouterLink } from 'src/routes/components';
+import { useSnackbar } from 'notistack';
+import { forgotPassword } from 'src/api/axios';
+import AlertDialog from 'src/components/dialog/AlertDialog';
 
 type LoginType = 'EMAIL' | 'MOBILE';
 
 export default function ForgotPasswordPage() {
+    const { enqueueSnackbar } = useSnackbar();
+
+    const [loading, setLoading] = useState(false);
     const { t } = useTranslation();
 
     const [loginType, setLoginType] = useState<LoginType>('EMAIL');
     const [identifier, setIdentifier] = useState('');
 
     const isEmail = loginType === 'EMAIL';
+
+    const [alertOpen, setAlertOpen] = useState(false);
+    const [alertTitle, setAlertTitle] = useState("");
+    const [alertMessage, setAlertMessage] = useState("");
+
+    const handleSubmit = async () => {
+        if (!identifier) {
+            return;
+        }
+
+        try {
+            setLoading(true);
+
+            const response = await forgotPassword({
+                identifier,
+                loginType,
+            });
+
+            console.log('Forgot password response:', response);
+
+
+            if (response.success) {
+                setAlertTitle(t("common.success"));
+                setAlertMessage(response.data);
+                setAlertOpen(true);
+            } else {
+
+                
+
+                if (
+                    response.error?.code === "auth.password.reset.already.requested"
+                ) {
+                    setAlertTitle(t("common.error"));
+                    setAlertMessage(response.error.message);
+                    setAlertOpen(true);
+                }
+            }
+
+        } catch (error: any) {
+
+
+            enqueueSnackbar(
+                error?.response?.data?.error?.message ??
+                t('common.somethingWentWrong'),
+                {
+                    variant: 'error',
+                }
+            );
+
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
         <Stack spacing={3}>
@@ -76,10 +137,14 @@ export default function ForgotPasswordPage() {
                 fullWidth
                 size="large"
                 variant="contained"
+                onClick={handleSubmit}
+                disabled={loading}
             >
-                {isEmail
-                    ? t('auth.forgotPassword.sendResetLink')
-                    : t('auth.forgotPassword.sendOtp')}
+                {loading
+                    ? t('common.loading')
+                    : loginType === 'EMAIL'
+                        ? t('auth.forgotPassword.sendResetLink')
+                        : t('auth.forgotPassword.sendOtp')}
             </Button>
 
             <Typography
@@ -100,10 +165,19 @@ export default function ForgotPasswordPage() {
                 {t('auth.forgotPassword.backToSignIn')}
             </Link>
 
+            <AlertDialog
+                open={alertOpen}
+                title={alertTitle}
+                message={alertMessage}
+                onClose={() => setAlertOpen(false)}
+            />
 
-            
+
+
         </Stack>
 
-        
+
+
+
     );
 }

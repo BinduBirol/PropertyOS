@@ -14,7 +14,7 @@ public class ForgotPasswordRequest {
     @NotBlank(message = "{validation.identifier.required}")
     @Schema(
             description = "Email address or mobile number",
-            example = "john@example.com"
+            example = "john@example.com / 01800000000"
     )
     private String identifier;
 

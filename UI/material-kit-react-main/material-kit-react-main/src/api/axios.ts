@@ -99,4 +99,28 @@ api.interceptors.response.use(
   }
 );
 
+export type ForgotPasswordRequest = {
+  identifier: string;
+  loginType: 'EMAIL' | 'MOBILE';
+};
+
+export type ApiResponse<T> = {
+  success: boolean;
+  data: T;
+  error?: {
+    code: string;
+    message: string;
+  };
+  timestamp: string;
+  path: string;
+  version: string;
+  correlationId?: string;
+};
+
+export async function forgotPassword(payload: ForgotPasswordRequest) {
+  const response = await api.post<ApiResponse<string>>('/v1/forgot-password', payload);
+
+  return response.data;
+}
+
 export default api;

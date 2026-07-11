@@ -1,6 +1,7 @@
 package com.bnroll.auth.repository;
 
 import com.bnroll.commercedomain.entity.password.PasswordResetToken;
+import com.bnroll.commercedomain.entity.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -23,4 +24,6 @@ public interface PasswordResetTokenRepository
                    AND t.used = false
             """)
     void invalidateAllByUserId(Long userId, Instant usedAt);
+
+    Optional<PasswordResetToken> findByUserAndUsedFalse(User user);
 }

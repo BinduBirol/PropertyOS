@@ -34,7 +34,9 @@
       "sendResetLink": "Send Reset Link",
       "sendOtp": "Send OTP",
       "backToSignIn": "Back to Sign In",
-      "info": "You will receive a password reset link or a one-time password (OTP) depending on the selected login method."
+      "info": "You will receive a password reset link or a one-time password (OTP) depending on the selected login method.",
+      "success": "Password reset instructions have been sent successfully.",
+      "error": "Unable to process your request. Please try again."
     }
   },
   "business": {
@@ -43,6 +45,7 @@
     "create": "Create business"
   },
   "common": {
+    "ok": "OK",
     "save": "Save",
     "cancel": "Cancel",
     "delete": "Delete",
@@ -50,7 +53,9 @@
     "or": "OR",
     "serverUnavailable": "Unable to connect to the server.",
     "somethingWentWrong": "Something went wrong.",
-    "continue": "Continue"
+    "continue": "Continue",
+    "success": "Request successful",
+    "error": "Error"
   },
   "nav": {
     "dashboard": "Dashboard",

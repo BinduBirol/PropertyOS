@@ -16,12 +16,14 @@ import com.bnroll.commercedomain.entity.password.PasswordResetToken;
 import com.bnroll.commercedomain.entity.user.LoginType;
 import com.bnroll.commercedomain.entity.user.RoleName;
 import com.bnroll.commercedomain.entity.user.User;
+import com.bnroll.common.dto.response.ApiResponse;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -49,6 +51,8 @@ public class AuthService {
     private final HttpServletRequest httpServletRequest;
     private final KafkaProducer kafkaProducer;
     private final RefreshTokenRepository refreshTokenRepository;
+
+    private final MessageSource messageSource;
 
     @Value("${jwt.access-token.expiration}")
     private long accessTokenExpiration;
@@ -234,7 +238,9 @@ public class AuthService {
     }
 
     @Transactional
-    public void forgotPassword(ForgotPasswordRequest request) {
+    public ApiResponse<String> forgotPassword(
+            ForgotPasswordRequest request,
+            Locale locale, HttpServletRequest httpRequest) {
 
         LoginType loginType =
                 authUtil.parseLoginType(request.getLoginType());
@@ -244,22 +250,42 @@ public class AuthService {
                 loginType
         );
 
-        if (user == null) {
-            return ;
+        // Security: don't reveal whether user exists
+        if (user != null) {
+            String token = passwordResetService.createPasswordResetToken(user, locale);
+
+            kafkaProducer.sendPasswordResetRequestedEvent(
+                    new PasswordResetRequestedEvent(
+                            user.getId(),
+                            user.getEmail(),
+                            user.getPhone(),
+                            loginType,
+                            token,
+                            LocalDateTime.now()
+                    )
+            );
+
+        } else {
+            throw new AuthException("user.notfound", HttpStatus.NOT_FOUND);
         }
 
-        String token = passwordResetService.createPasswordResetToken(user);
+        String messageKey = loginType == LoginType.EMAIL
+                ? "auth.password.reset.requested.email"
+                : "auth.password.reset.requested.phone";
 
-        kafkaProducer.sendPasswordResetRequestedEvent(
-                new PasswordResetRequestedEvent(
-                        user.getId(),
-                        user.getEmail(),
-                        user.getPhone(),
-                        loginType,
-                        token,
-                        LocalDateTime.now()
-                )
+        String response = messageSource.getMessage(
+                messageKey,
+                null,
+                locale
         );
+
+        return ApiResponse.<String>builder()
+                .success(true)
+                .data(response)
+                .timestamp(LocalDateTime.now())
+                .version("v1")
+                .path(httpRequest.getRequestURI())
+                .build();
     }
 
     @Transactional

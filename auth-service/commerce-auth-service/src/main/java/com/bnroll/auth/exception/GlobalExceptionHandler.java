@@ -44,7 +44,7 @@ public class GlobalExceptionHandler {
                 .success(false)
                 .error(ApiError.builder()
                         .code(ex.getCode())
-                        .message(messageSource.getMessage(ex.getCode(), null, locale))
+                        .message(messageSource.getMessage(ex.getCode(), ex.getArgs(), locale))
                         .status(ex.getStatus().value())
                         .service(serviceName)
                         .build())
@@ -53,6 +53,8 @@ public class GlobalExceptionHandler {
                 .version("v1")
                 .build();
     }
+
+
 
     // FIELD ERROR
     @ExceptionHandler(MethodArgumentNotValidException.class)

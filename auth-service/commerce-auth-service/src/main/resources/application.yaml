@@ -54,7 +54,7 @@ logging:
     org.springframework.security: DEBUG
 
 jwt:
-  secret: my-super-secret-key-my-super-secret-key
+  secret: 6d8b4d5f1c8a9e73b2f4d1a7c9e8f6b5a1d3e7f9c2b4a6d8e1f3c5b7a9d2e4f6
   access-token:
     expiration: 300000
 

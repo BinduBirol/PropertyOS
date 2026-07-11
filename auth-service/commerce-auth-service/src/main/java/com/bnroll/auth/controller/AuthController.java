@@ -101,11 +101,11 @@ public class AuthController {
     }
 
     @PostMapping("/v1/forgot-password")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void forgotPassword(
-            @RequestBody @Valid ForgotPasswordRequest request) {
+    public ApiResponse<String> forgotPassword(
+            @RequestBody @Valid ForgotPasswordRequest request,
+            Locale locale, HttpServletRequest httpRequest) {
 
-        authService.forgotPassword(request);
+        return authService.forgotPassword(request, locale, httpRequest);
     }
 
     @PostMapping("/v1/reset-password")

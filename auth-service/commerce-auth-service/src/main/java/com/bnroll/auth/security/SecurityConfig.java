@@ -35,7 +35,9 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/v1/login",
                                 "/v1/register",
-                                "/v1/refresh"
+                                "/v1/refresh",
+                                "/v1/forgot-password",
+                                "/v1/reset-password"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
