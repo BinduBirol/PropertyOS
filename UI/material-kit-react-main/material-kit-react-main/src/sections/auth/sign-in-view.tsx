@@ -97,7 +97,7 @@ export function SignInView() {
         loginType
       });
 
-      //console.log(response);
+      console.log(response);
 
       if (!response.success) {
 
