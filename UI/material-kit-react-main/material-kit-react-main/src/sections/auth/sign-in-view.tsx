@@ -104,7 +104,7 @@ export function SignInView() {
       enqueueSnackbar(
         t('auth.loggedOut'),
         {
-          variant: 'error'
+          variant: 'info'
         }
       );
 

@@ -7,8 +7,8 @@ import IconButton from '@mui/material/IconButton';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 import MenuItem, { menuItemClasses } from '@mui/material/MenuItem';
-import ContrastIcon from '@mui/icons-material/Contrast';
 import type { IconButtonProps } from '@mui/material/IconButton';
+import BrightnessAutoIcon from '@mui/icons-material/BrightnessAuto';
 
 type ThemeMode = 'light' | 'dark' | 'system';
 
@@ -83,11 +83,11 @@ export function ThemePopover({
 
     const currentIcon =
         activeMode === 'dark' ? (
-            <Brightness4Icon  />
+            <Brightness4Icon />
         ) : activeMode === 'light' ? (
-            <Brightness7Icon sx={{color: 'warning.main'}} />
+            <Brightness7Icon sx={{ color: 'warning.main' }} />
         ) : (
-            <ContrastIcon sx={{color: 'primary.main'}} />
+            <BrightnessAutoIcon sx={{ color: 'primary.main' }} />
         );
 
     return (
@@ -120,7 +120,7 @@ export function ThemePopover({
                         selected={activeMode === 'light'}
                         onClick={() => applyMode('light')}
                     >
-                        <Brightness7Icon fontSize="small" sx={{ mr: 1 , color: 'warning.main'}} />
+                        <Brightness7Icon fontSize="small" sx={{ mr: 1, color: 'warning.main' }} />
                         Light
                     </MenuItem>
 
@@ -136,7 +136,9 @@ export function ThemePopover({
                         selected={activeMode === 'system'}
                         onClick={() => applyMode('system')}
                     >
-                        <ContrastIcon fontSize="small" sx={{ mr: 1, color: 'primary.main' }} />
+
+
+                        <BrightnessAutoIcon fontSize="small" sx={{ mr: 1, color: 'primary.main' }} />
                         Auto
                     </MenuItem>
                 </MenuList>
