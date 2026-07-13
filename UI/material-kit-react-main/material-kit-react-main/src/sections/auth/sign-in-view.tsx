@@ -228,7 +228,7 @@ export function SignInView() {
 
           password: data.password,
 
-          role: 'CUSTOMER',
+          role: 'OWNER',
 
           loginType
 

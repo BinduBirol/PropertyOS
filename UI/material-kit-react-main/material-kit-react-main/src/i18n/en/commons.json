@@ -53,9 +53,9 @@
     }
   },
   "business": {
-    "add_new": "Add new business",
-    "list": "Business list",
-    "create": "Create business"
+    "add_new": "Add new property",
+    "list": "Property list",
+    "create": "Create property"
   },
   "common": {
     "ok": "OK",
@@ -126,5 +126,15 @@
     "passwordMinLength": "Password must be at least 8 characters.",
     "passwordMaxLength": "Password must not exceed 100 characters.",
     "passwordMismatch": "Passwords do not match."
+  },
+
+  "userRole": {
+    "SUPER_ADMIN": "Super Admin",
+    "OWNER": "Owner",
+    "PROPERTY_MANAGER": "Property Manager",
+    "ACCOUNTANT": "Accountant",
+    "SECURITY_GUARD": "Security Guard",
+    "MAINTENANCE_STAFF": "Maintenance Staff",
+    "TENANT": "Tenant"
   }
 }

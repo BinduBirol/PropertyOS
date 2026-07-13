@@ -1,10 +1,9 @@
 package com.bnroll.auth.event.config;
 
-import com.bnroll.auth.dto.otp.ResendVerificationOtpRequest;
-import com.bnroll.auth.event.dto.*;
-import com.bnroll.commercedomain.entity.user.User;
-import com.bnroll.enums.VerificationPurpose;
-import jakarta.validation.Valid;
+
+import com.bnroll.auth.entity.user.User;
+import com.bnroll.commercedomain.enums.VerificationPurpose;
+import com.bnroll.commercedomain.event.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;

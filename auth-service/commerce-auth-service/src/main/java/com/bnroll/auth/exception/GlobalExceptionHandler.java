@@ -1,5 +1,6 @@
 package com.bnroll.auth.exception;
 
+import com.bnroll.commercedomain.exception.AuthException;
 import com.bnroll.common.dto.response.ApiError;
 import com.bnroll.common.dto.response.ApiResponse;
 import com.bnroll.common.i18n.MessageService;
@@ -54,7 +55,6 @@ public class GlobalExceptionHandler {
                 .version("v1")
                 .build();
     }
-
 
 
     // FIELD ERROR

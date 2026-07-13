@@ -1,14 +1,15 @@
 package com.bnroll.auth.service;
 
 import com.bnroll.auth.dto.otp.VerifyAccountRequest;
+import com.bnroll.auth.entity.user.User;
+import com.bnroll.auth.entity.verification.VerificationOtp;
 import com.bnroll.auth.event.config.KafkaProducer;
-import com.bnroll.auth.exception.AuthException;
 import com.bnroll.auth.repository.UserRepository;
 import com.bnroll.auth.repository.VerificationOtpRepository;
 import com.bnroll.auth.util.OtpGenerator;
-import com.bnroll.commercedomain.entity.user.User;
-import com.bnroll.commercedomain.entity.verification.VerificationOtp;
-import com.bnroll.enums.VerificationPurpose;
+
+import com.bnroll.commercedomain.enums.VerificationPurpose;
+import com.bnroll.commercedomain.exception.AuthException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

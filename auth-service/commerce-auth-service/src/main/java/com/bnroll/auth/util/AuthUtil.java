@@ -1,16 +1,17 @@
 package com.bnroll.auth.util;
 
 import com.bnroll.auth.dto.LoginRequest;
-import com.bnroll.auth.exception.AuthException;
+import com.bnroll.auth.entity.auth.RefreshToken;
+import com.bnroll.auth.entity.password.PasswordResetToken;
+import com.bnroll.auth.entity.user.User;
 import com.bnroll.auth.repository.PasswordResetTokenRepository;
 import com.bnroll.auth.repository.RefreshTokenRepository;
 import com.bnroll.auth.repository.UserRepository;
 import com.bnroll.auth.security.JwtUtil;
-import com.bnroll.commercedomain.entity.auth.RefreshToken;
-import com.bnroll.commercedomain.entity.password.PasswordResetToken;
-import com.bnroll.commercedomain.entity.user.LoginType;
-import com.bnroll.commercedomain.entity.user.RoleName;
-import com.bnroll.commercedomain.entity.user.User;
+
+import com.bnroll.commercedomain.enums.user.LoginType;
+import com.bnroll.commercedomain.enums.user.RoleName;
+import com.bnroll.commercedomain.exception.AuthException;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -160,7 +161,7 @@ public class AuthUtil {
 
         User user = storedToken.getUser();
 
-        if (!jwtUtil.isTokenValid(refreshToken, user.getEmail())) {
+        if (!jwtUtil.isTokenValid(refreshToken, user.getId())) {
             throw new AuthException(
                     "validation.failed",
                     HttpStatus.UNAUTHORIZED

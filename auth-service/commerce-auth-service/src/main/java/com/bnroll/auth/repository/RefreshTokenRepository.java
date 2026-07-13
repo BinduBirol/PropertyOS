@@ -1,7 +1,7 @@
 package com.bnroll.auth.repository;
 
-import com.bnroll.commercedomain.entity.auth.RefreshToken;
-import com.bnroll.commercedomain.entity.user.User;
+import com.bnroll.auth.entity.auth.RefreshToken;
+import com.bnroll.auth.entity.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

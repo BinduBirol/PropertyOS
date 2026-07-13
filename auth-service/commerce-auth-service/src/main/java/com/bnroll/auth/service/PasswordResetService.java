@@ -1,11 +1,12 @@
 package com.bnroll.auth.service;
 
-import com.bnroll.auth.exception.AuthException;
+import com.bnroll.auth.entity.password.PasswordResetToken;
+import com.bnroll.auth.entity.user.User;
 import com.bnroll.auth.repository.PasswordResetTokenRepository;
 import com.bnroll.auth.security.JwtUtil;
 import com.bnroll.auth.util.OtpGenerator;
-import com.bnroll.commercedomain.entity.password.PasswordResetToken;
-import com.bnroll.commercedomain.entity.user.User;
+
+import com.bnroll.commercedomain.exception.AuthException;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -89,7 +89,7 @@ public class PasswordResetService {
             throw new AuthException("password.reset.token.expired", HttpStatus.BAD_REQUEST);
         }
 
-        if (!jwtUtil.isTokenValid(token, storedToken.getUser().getEmail())) {
+        if (!jwtUtil.isTokenValid(token, storedToken.getUser().getId())) {
             throw new AuthException("password.reset.token.invalid", HttpStatus.BAD_REQUEST);
         }
 

@@ -1,6 +1,7 @@
 package com.bnroll.auth.repository;
 
-import com.bnroll.commercedomain.entity.auth.LoginAttempt;
+
+import com.bnroll.auth.entity.auth.LoginAttempt;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

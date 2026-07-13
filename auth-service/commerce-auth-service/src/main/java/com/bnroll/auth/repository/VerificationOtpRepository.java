@@ -1,9 +1,9 @@
 package com.bnroll.auth.repository;
 
 
-import com.bnroll.commercedomain.entity.user.User;
-import com.bnroll.commercedomain.entity.verification.VerificationOtp;
-import com.bnroll.enums.VerificationPurpose;
+import com.bnroll.auth.entity.user.User;
+import com.bnroll.auth.entity.verification.VerificationOtp;
+import com.bnroll.commercedomain.enums.VerificationPurpose;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.Instant;

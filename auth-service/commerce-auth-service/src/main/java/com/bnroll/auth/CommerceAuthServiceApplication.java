@@ -9,7 +9,6 @@ import org.springframework.boot.security.autoconfigure.UserDetailsServiceAutoCon
         scanBasePackages = "com.bnroll",
         exclude = UserDetailsServiceAutoConfiguration.class
 )
-@EntityScan("com.bnroll.commercedomain.entity")
 public class CommerceAuthServiceApplication {
 
     public static void main(String[] args) {

@@ -92,7 +92,7 @@ export function RegisterView() {
 
                 const response = await register({
                     ...data,
-                    role: "CUSTOMER",
+                    role: "OWNER",
                 });
 
 

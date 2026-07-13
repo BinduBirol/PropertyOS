@@ -1,6 +1,6 @@
 package com.bnroll.auth.security.ratelimit;
 
-import com.bnroll.auth.exception.AuthException;
+import com.bnroll.commercedomain.exception.AuthException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.ProceedingJoinPoint;

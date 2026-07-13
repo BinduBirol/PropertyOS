@@ -47,8 +47,16 @@ public class RegisterRequest {
 
     @Schema(
             description = "Role assigned to the user",
-            allowableValues = {"ADMIN", "SELLER", "CUSTOMER"},
-            example = "CUSTOMER"
+            allowableValues = {
+                    "SUPER_ADMIN",
+                    "OWNER",
+                    "PROPERTY_MANAGER",
+                    "ACCOUNTANT",
+                    "SECURITY_GUARD",
+                    "MAINTENANCE_STAFF",
+                    "TENANT"
+            },
+            example = "OWNER"
     )
     @NotBlank(message = "{role.required}")
     private String role;

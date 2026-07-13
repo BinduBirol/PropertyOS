@@ -23,8 +23,16 @@ public class RefreshTokenRequest {
 
     @Schema(
             description = "Role to log in as.",
-            allowableValues = {"ADMIN", "SELLER", "CUSTOMER"},
-            example = "CUSTOMER"
+            allowableValues = {
+                    "SUPER_ADMIN",
+                    "OWNER",
+                    "PROPERTY_MANAGER",
+                    "ACCOUNTANT",
+                    "SECURITY_GUARD",
+                    "MAINTENANCE_STAFF",
+                    "TENANT"
+            },
+            example = "OWNER"
     )
     @NotBlank(message = "{role.required}")
     private String role;

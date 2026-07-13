@@ -2,20 +2,19 @@ package com.bnroll.auth.controller;
 
 import com.bnroll.auth.dto.otp.ResendVerificationOtpRequest;
 import com.bnroll.auth.dto.otp.VerifyAccountRequest;
-import com.bnroll.auth.exception.AuthException;
+import com.bnroll.auth.entity.user.User;
 import com.bnroll.auth.repository.UserRepository;
 import com.bnroll.auth.service.AccountVerificationService;
-import com.bnroll.auth.util.AuthUtil;
-import com.bnroll.commercedomain.entity.user.User;
+
+import com.bnroll.commercedomain.enums.VerificationPurpose;
+import com.bnroll.commercedomain.exception.AuthException;
 import com.bnroll.common.dto.response.ApiResponse;
 import com.bnroll.common.i18n.MessageService;
-import com.bnroll.enums.VerificationPurpose;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

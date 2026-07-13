@@ -1,8 +1,9 @@
 package com.bnroll.auth.service;
 
-import com.bnroll.commercedomain.entity.user.LoginType;
-import com.bnroll.commercedomain.entity.user.RoleName;
-import com.bnroll.commercedomain.entity.user.User;
+
+import com.bnroll.auth.entity.user.User;
+import com.bnroll.commercedomain.enums.user.LoginType;
+import com.bnroll.commercedomain.enums.user.RoleName;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.constraints.NotBlank;
 

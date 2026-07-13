@@ -4,25 +4,22 @@ package com.bnroll.auth.service;
 import com.bnroll.auth.dto.*;
 import com.bnroll.auth.dto.forgetpassword.ForgotPasswordRequest;
 import com.bnroll.auth.dto.forgetpassword.ResetPasswordRequest;
+import com.bnroll.auth.entity.auth.RefreshToken;
+import com.bnroll.auth.entity.password.PasswordResetToken;
+import com.bnroll.auth.entity.user.User;
 import com.bnroll.auth.event.config.KafkaProducer;
-import com.bnroll.auth.event.dto.*;
-import com.bnroll.auth.exception.AuthException;
 import com.bnroll.auth.repository.RefreshTokenRepository;
 import com.bnroll.auth.repository.UserRepository;
-import com.bnroll.auth.security.JwtUtil;
 import com.bnroll.auth.util.AuthUtil;
-import com.bnroll.commercedomain.entity.auth.RefreshToken;
-import com.bnroll.commercedomain.entity.password.PasswordResetToken;
-import com.bnroll.commercedomain.entity.user.LoginType;
-import com.bnroll.commercedomain.entity.user.RoleName;
-import com.bnroll.commercedomain.entity.user.User;
+
+import com.bnroll.commercedomain.enums.VerificationPurpose;
+import com.bnroll.commercedomain.enums.user.LoginType;
+import com.bnroll.commercedomain.enums.user.RoleName;
+import com.bnroll.commercedomain.event.*;
+import com.bnroll.commercedomain.exception.AuthException;
 import com.bnroll.common.dto.response.ApiResponse;
-import com.bnroll.enums.VerificationPurpose;
-import io.jsonwebtoken.JwtException;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
@@ -31,12 +28,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
-import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Locale;
 import java.util.Set;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor

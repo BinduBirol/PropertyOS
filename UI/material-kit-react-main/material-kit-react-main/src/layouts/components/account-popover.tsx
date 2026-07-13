@@ -101,7 +101,7 @@ export function AccountPopover({ data = [], sx, ...other }: AccountPopoverProps)
             sx={{ color: "text.secondary" }}
             noWrap
           >
-            {user?.email}
+            {user?.phone}
           </Typography>
         </Box>
 

@@ -1,6 +1,7 @@
 package com.bnroll.auth.repository;
 
-import com.bnroll.commercedomain.entity.user.User;
+
+import com.bnroll.auth.entity.user.User;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.data.jpa.repository.JpaRepository;
 
