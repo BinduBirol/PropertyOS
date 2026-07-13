@@ -1,145 +1,175 @@
-# Commerce Platform
+# BNroll Property Management Platform
 
-A modular e-commerce platform built with **Spring Boot**, **Microservices**, and **Event-Driven Architecture**.
+A production-oriented **property management platform** built with **Spring Boot Microservices**, **React**, and **Event-Driven Architecture**.
 
-The project follows a production-oriented approach with independent services communicating through REST APIs and asynchronous events.
+The system is designed with independent services communicating through REST APIs and asynchronous events using Apache Kafka.
 
 ---
 
 ## Tech Stack
 
-* Java 21
-* Spring Boot
-* Spring Security
-* Spring Data JPA
-* MySQL
-* Apache Kafka
-* Spring Kafka
-* JWT Authentication
-* Maven
-* Hibernate
-* REST API
-* Event-Driven Architecture
-* Internationalization (i18n)
-* JUnit & Mockito (in progress)
+### Backend
+- Java 26
+- Spring Boot
+- Spring Security
+- Spring Data JPA
+- Hibernate
+- MySQL
+- Apache Kafka
+- Spring Kafka
+- JWT Authentication
+- Maven
+- REST API
+- Bean Validation
+- Internationalization (i18n)
+- JUnit & Mockito
+
+### Frontend
+- React
+- TypeScript
+- Material UI (MUI)
+- React Router
+- i18n Support
+
+### Infrastructure
+- Docker
+- Apache Kafka
+- MySQL
+- Kubernetes (planned)
 
 ---
 
 ## Project Structure
 
 ```text
-commerce-parent
-│
-│
+bnroll-platform
 ├── commerce-domain
-│   ├── Shared entities
 │   ├── BaseEntity
+│   ├── Shared events
 │   ├── Common enums
-│   └── Shared domain models
-│   ├── Common API response
-│   └── Shared annotations
+│   └── Shared DTOs
 │
-├── commerce-auth-service
-│   ├── Authentication
-│   ├── User registration
+├── auth-service
+│   ├── User authentication
+│   ├── Registration
 │   ├── Login
 │   ├── JWT generation
 │   ├── Role management
-│   ├── User management
-│   └── Kafka event publishing
-│       ├── UserRegisteredEvent
-│       ├── LoginSuccessEvent
-│       └── LoginFailedEvent
+│   └── Security
 │
-├── commerce-product-service
+├── property-service
+│   ├── Property management
+│   ├── Unit management
+│   ├── Property ownership
+│   └── Property user roles
 │
-├── commerce-order-service
+├── lease-service
 │
-├── commerce-payment-service
+├── payment-service
 │
-├── commerce-notification-service
+├── notification-service
 │
-└── commerce-gateway
+├── api-gateway
+│
+└── web-client
+    ├── React
+    ├── TypeScript
+    └── Material UI
 ```
 
 ---
 
 ## Current Features
 
-* User Registration
-* User Login
-* JWT Authentication
-* BCrypt Password Encryption
-* Role-based Authentication
-* Global Exception Handling
-* Standardized API Response
-* Request Validation
-* Localization (English & Bangla)
-* Rate Limiting
-* Shared Domain Module
-* Shared Common Module
-* Kafka Event Publishing
-* Event-driven communication between services
+- User registration and authentication
+- JWT-based authentication between services
+- Role-based authorization
+- Property management
+- Unit management
+- Shared domain module
+- Common API response format
+- Global exception handling
+- Request validation
+- Multi-language support (English & Bangla)
+- Kafka event publishing
+- Docker-based service deployment
+
+---
+
+## Authentication Architecture
+
+The platform uses JWT authentication with a centralized authentication service.
+
+Flow:
+```text
+Client
+|
+v
+Auth Service
+|
+| Generates JWT
+|
+v
+Other Services
+|
+| Validate JWT
+|
+v
+Authorized Request
+```
+
+JWT contains:
+```json
+{
+  "sub": "userId",
+  "email": "user@email.com",
+  "phone": "phone",
+  "role": "OWNER"
+}
+```
 
 ---
 
 ## Event-Driven Architecture
 
-The platform uses **Apache Kafka** for asynchronous communication between microservices.
-
-Services publish domain events instead of directly depending on other services.
+Apache Kafka is used for asynchronous communication between services.
 
 Example:
-
-### User Registration Flow
-
-```
-Client
-  |
-  v
+```text
 Auth Service
-  |
-  ├── Save User
-  |
-  ├── Publish UserRegisteredEvent
-  |
-  v
-Kafka Topic: user-registered
-  |
-  +----------------------+
-  |                      |
-  v                      v
-Notification Service   Audit Service
-(send email)           (store activity)
+      |
+      |
+      v
+UserRegisteredEvent
+      |
+      |
+      v
+Kafka Topic
+      |
+      +----------------+
+
+      |                |
+      v                v
+Notification       Audit
+Service            Service
 ```
 
 Current events:
-
-* `UserRegisteredEvent`
-* `LoginSuccessEvent`
-* `LoginFailedEvent`
+* UserRegisteredEvent
+* LoginSuccessEvent
+* LoginFailedEvent
 
 Future events:
-
-* OrderCreatedEvent
+* PropertyCreatedEvent
+* LeaseCreatedEvent
 * PaymentCompletedEvent
-* InventoryUpdatedEvent
-* ProductUpdatedEvent
-
-Benefits:
-
-* Loose coupling between services
-* Independent service scaling
-* Asynchronous processing
-* Easier integration of new services
-* Improved reliability
+* NotificationSentEvent
 
 ---
 
 ## API Response Format
 
-Successful Response
-
+Success:
 ```json
 {
   "success": true,
@@ -150,38 +180,32 @@ Successful Response
 }
 ```
 
-Error Response
-
+Error:
 ```json
 {
   "success": false,
   "error": {
     "code": "...",
     "message": "...",
-    "status": 400,
-    "fieldErrors": {}
+    "status": 400
   },
   "timestamp": "...",
-  "path": "...",
-  "version": "v1"
+  "path": "..."
 }
 ```
 
 ---
 
-## Internationalization (i18n)
+## Internationalization
 
-The project supports multiple languages using the `Accept-Language` request header.
+Supports multiple languages using request headers.
 
 Example:
-
-```
+```text
 Accept-Language: en
 ```
-
 or
-
-```
+```text
 Accept-Language: bn
 ```
 
@@ -189,53 +213,35 @@ Accept-Language: bn
 
 ## Planned Services
 
-* Product Service
-* Inventory Service
-* Cart Service
-* Order Service
+* Lease Management
+* Rent Collection
 * Payment Service
 * Notification Service
-* Audit Service
+* Maintenance Management
+* Reporting Service
 * API Gateway
 * Service Discovery
 * Config Server
 
 ---
 
-## Testing
+## Development Goals
 
-Planned testing strategy includes:
+This project focuses on building a real-world SaaS platform while practicing:
 
-* Unit Tests
-* Controller Tests
-* Repository Tests
-* Integration Tests
-* Security Tests
-* Testcontainers
-* Performance Testing
-
----
-
-## Goals
-
-This project is being developed as a learning-oriented, production-style microservices application to practice:
-
-* Spring Boot
 * Microservices Architecture
-* Event-Driven Architecture
-* Apache Kafka
-* Security
-* JWT Authentication
+* Event-Driven Systems
+* Spring Boot
+* Distributed Security
 * REST API Design
-* Clean Architecture
-* Testing
+* React Application Development
+* Docker Deployment
+* Cloud-Native Architecture
 * CI/CD
-* Docker
-* Kubernetes (future)
-* Cloud Deployment (future)
+* Kubernetes
 
 ---
 
 ## Status
 
-🚧 Active development.
+🚧 Active Development
