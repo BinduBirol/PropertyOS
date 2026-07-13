@@ -7,9 +7,10 @@ const icon = (name: string) => (
 
 export type NavItem = {
   title: string; // translation key
-  path: string;
-  icon: React.ReactNode;
+  path?: string;
+  icon?: React.ReactNode;
   info?: React.ReactNode;
+  children?: NavItem[];
 };
 
 export const navData: NavItem[] = [
@@ -33,16 +34,28 @@ export const navData: NavItem[] = [
       </Label>
     ),
   },
+
+
   {
-    title: 'nav.blog',
-    path: '/blog',
-    icon: icon('ic-blog'),
-  },
-  {
-    title: 'nav.signIn',
-    path: '/sign-in',
+    title: 'nav.properties',
     icon: icon('ic-lock'),
+    children: [
+      {
+        title: 'nav.blog',
+        path: '/blog',
+
+      },
+      {
+        title: 'nav.units',
+        path: '/units',
+      },
+      {
+        title: 'nav.leases',
+        path: '/leases',
+      },
+    ],
   },
+
   {
     title: 'nav.notFound',
     path: '/404',

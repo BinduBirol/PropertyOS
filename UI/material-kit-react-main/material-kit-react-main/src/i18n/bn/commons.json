@@ -79,7 +79,18 @@
     "notFound": "পাওয়া যায়নি",
     "profile": "প্রোফাইল",
     "settings": "সেটিংস",
-    "home": "হোম"
+    "home": "হোম",
+
+    "properties": "প্রপার্টি",
+    "units": "ইউনিট",
+    "tenants": "ভাড়াটিয়া",
+    "leases": "লিজ",
+    "payments": "পেমেন্ট",
+    "maintenance": "রক্ষণাবেক্ষণ",
+    "invoices": "চালান",
+    "reports": "রিপোর্ট",
+    "notifications": "নোটিফিকেশন",
+    "members": "সদস্য"
   },
   "register": {
     "title": "অ্যাকাউন্ট তৈরি করুন",

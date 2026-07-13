@@ -79,7 +79,18 @@
     "notFound": "Not found",
     "profile": "Profile",
     "settings": "Settings",
-    "home": "Home"
+    "home": "Home",
+
+    "properties": "Properties",
+    "units": "Units",
+    "tenants": "Tenants",
+    "leases": "Leases",
+    "payments": "Payments",
+    "maintenance": "Maintenance",
+    "invoices": "Invoices",
+    "reports": "Reports",
+    "notifications": "Notifications",
+    "members": "Members"
   },
   "register": {
     "title": "Create Account",
