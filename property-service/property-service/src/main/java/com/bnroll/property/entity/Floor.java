@@ -11,10 +11,10 @@ import java.util.UUID;
 
 @Entity
 @Table(
-        name = "property_floors",
+        name = "facility_floors",
         indexes = {
-                @Index(name = "idx_floor_property", columnList = "propertyId"),
-                @Index(name = "idx_floor_property_number", columnList = "propertyId,floorNumber", unique = true)
+                @Index(name = "idx_floor_property", columnList = "facilityId"),
+                @Index(name = "idx_floor_property_number", columnList = "facilityId,floorNumber", unique = true)
         }
 )
 @Getter
@@ -25,7 +25,7 @@ import java.util.UUID;
 public class Floor extends BaseEntity {
 
     @Column(nullable = false)
-    private UUID propertyId;
+    private UUID facilityId;
 
     @Column(nullable = false)
     private Integer floorNumber;

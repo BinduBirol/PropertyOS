@@ -6,14 +6,14 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "property_member")
+@Table(name = "facility_member")
 @Getter
 @Setter
-public class PropertyMember extends BaseEntity {
+public class FacilityMember extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "property_id", nullable = false)
-    private Property property;
+    @JoinColumn(name = "facility_id", nullable = false)
+    private Facility facility;
 
 
     @Column(nullable = false)

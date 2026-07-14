@@ -5,13 +5,13 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "property")
+@Table(name = "facility")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Property extends BaseEntity {
+public class Facility extends BaseEntity {
 
 
     @Column(nullable = false, length = 150)
@@ -19,7 +19,7 @@ public class Property extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 30)
-    private PropertyType type;
+    private FacilityType type;
 
     @Column(nullable = false, length = 255)
     private String addressLine1;

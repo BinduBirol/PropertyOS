@@ -1,6 +1,6 @@
 package com.bnroll.property.entity;
 
-public enum PropertyType {
+public enum FacilityType {
 
     RESIDENTIAL,
 

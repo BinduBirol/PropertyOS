@@ -4,9 +4,15 @@ import com.bnroll.property.security.UserPrincipal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController("/property")
 @RequiredArgsConstructor
 public class PropertyController {
 
@@ -31,5 +37,22 @@ public class PropertyController {
                 user.role()
         );
     }
+
+    @GetMapping("/debug-db")
+    public Map<String, String> debugDb(DataSource dataSource) throws Exception {
+
+        try (Connection con = dataSource.getConnection()) {
+
+            Map<String, String> result = new HashMap<>();
+
+            result.put("database", con.getCatalog());
+            result.put("url", con.getMetaData().getURL());
+            result.put("username", con.getMetaData().getUserName());
+            result.put("driver", con.getMetaData().getDriverName());
+
+            return result;
+        }
+    }
+
 
 }
