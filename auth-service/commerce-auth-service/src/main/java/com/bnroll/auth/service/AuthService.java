@@ -1,6 +1,7 @@
 package com.bnroll.auth.service;
 
 
+import com.bnroll.auth.client.PropertyClient;
 import com.bnroll.auth.dto.*;
 import com.bnroll.auth.dto.forgetpassword.ForgotPasswordRequest;
 import com.bnroll.auth.dto.forgetpassword.ResetPasswordRequest;
@@ -18,6 +19,7 @@ import com.bnroll.commercedomain.enums.user.RoleName;
 import com.bnroll.commercedomain.event.*;
 import com.bnroll.commercedomain.exception.AuthException;
 import com.bnroll.common.dto.response.ApiResponse;
+import com.bnroll.dto.property.FacilityDto;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -51,6 +53,8 @@ public class AuthService {
     private final MessageSource messageSource;
 
     private final AccountVerificationService accountVerificationService;
+
+    private final PropertyClient propertyClient;
 
     @Value("${jwt.access-token.expiration}")
     private long accessTokenExpiration;
@@ -130,7 +134,7 @@ public class AuthService {
             throw new AuthException("phone.already.exists", HttpStatus.CONFLICT);
         }
 
-        RoleName role = authUtil.parseRole(request.getRole());
+        //RoleName role = authUtil.parseRole(request.getRole().name());
 
         User user = new User();
         user.setEmail(request.getEmail());
@@ -138,9 +142,35 @@ public class AuthService {
         user.setFirstName(request.getFirstName());
         user.setLastName(request.getLastName());
         user.setPhone(request.getPhone());
-        user.setRoles(Set.of(role));
+        user.setRoles(Set.of(request.getRole()));
+
 
         User savedUser = userRepository.save(user);
+
+        try {
+
+            FacilityDto facilityDto = FacilityDto.builder()
+                    .name(request.getFacilityTitle())
+                    .type(request.getFacilityType())
+                    .addressLine1(request.getAddressLine1())
+                    .description(request.getDescription())
+                    .userRole(request.getRole())
+                    .creatorId(savedUser.getId())
+                    .build();
+
+
+            propertyClient.createFacility(facilityDto);
+
+
+        } catch (Exception e) {
+
+            userRepository.delete(savedUser);
+
+            throw new AuthException(
+                    "facility.creation.failed",
+                    HttpStatus.INTERNAL_SERVER_ERROR
+            );
+        }
 
         accountVerificationService.generateOtpAndPublish(user, VerificationPurpose.ACCOUNT_VERIFICATION);
 

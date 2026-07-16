@@ -5,6 +5,7 @@ import com.bnroll.auth.entity.user.User;
 import com.bnroll.auth.repository.RefreshTokenRepository;
 import com.bnroll.auth.security.JwtUtil;
 import com.bnroll.commercedomain.enums.user.RoleName;
+import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.Date;
 import java.util.UUID;
 
 @Service
@@ -87,5 +89,9 @@ public class JwtService {
                 user.getId(),
                 Instant.now()
         );
+    }
+
+    public String generateServiceToken(String serviceName) {
+        return jwtUtil.generateServiceToken(serviceName);
     }
 }

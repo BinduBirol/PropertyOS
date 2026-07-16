@@ -155,4 +155,20 @@ public class JwtUtil {
                 .signWith(getKey())
                 .compact();
     }
+
+    public String generateServiceToken(String service) {
+
+        String token = Jwts.builder()
+                .subject(service)
+                .claim("type", "SERVICE")
+                .claim("service", service)
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + accessTokenExpiration))
+                .signWith(getKey())
+                .compact();
+
+        System.out.println(token);
+
+        return token;
+    }
 }

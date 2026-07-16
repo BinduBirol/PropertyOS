@@ -1,11 +1,13 @@
 package com.bnroll.property.security;
 
+import com.bnroll.commercedomain.enums.ServiceName;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -48,9 +50,52 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             Claims claims = jwtService.extractClaims(token);
 
 
+            String tokenType = claims.get("type", String.class);
+
+
+            // Service token handling
+            if ("SERVICE".equals(tokenType)) {
+
+
+                String service = claims.get("service", String.class);
+
+
+                if (!ServiceName.exists(service)) {
+                    throw new BadCredentialsException("Invalid service token");
+                }
+
+
+                ServicePrincipal principal =
+                        new ServicePrincipal(service);
+
+
+                UsernamePasswordAuthenticationToken authentication =
+                        new UsernamePasswordAuthenticationToken(
+                                principal,
+                                null,
+                                List.of(
+                                        new SimpleGrantedAuthority(
+                                                "ROLE_INTERNAL_SERVICE"
+                                        )
+                                )
+                        );
+
+
+                SecurityContextHolder.getContext()
+                        .setAuthentication(authentication);
+
+
+                filterChain.doFilter(request, response);
+                return;
+            }
+
+
+            // User token handling
+
             Long userId = Long.parseLong(
                     claims.getSubject()
             );
+
 
             String email = claims.get("email", String.class);
 
@@ -89,9 +134,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             e.printStackTrace();
 
             SecurityContextHolder.clearContext();
+
             response.setStatus(
                     HttpServletResponse.SC_UNAUTHORIZED
             );
+
             return;
         }
 

@@ -49,10 +49,7 @@ export const navData: NavItem[] = [
         title: 'nav.myFacilities',
         path: '/property/facility/list',
       },
-      {
-        title: 'facility.create',
-        path: '/property/facility/create',
-      },
+
     ],
   },
 

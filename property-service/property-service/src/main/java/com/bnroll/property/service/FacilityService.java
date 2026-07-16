@@ -87,4 +87,45 @@ public class FacilityService {
 
         return saveFacility;
     }
+
+
+    @Transactional
+    public Facility createForRegistration(@Valid FacilityDto request) {
+
+
+        Facility facility = Facility.builder()
+                .name(request.getName())
+                .type(request.getType())
+                .addressLine1(request.getAddressLine1())
+                .addressLine2(request.getAddressLine2())
+                .city(request.getCity())
+                .country(request.getCountry())
+                .postalCode(request.getPostalCode())
+                .description(request.getDescription())
+                .build();
+
+
+        Facility saveFacility = facilityRepository.save(facility);
+
+        FacilityMember member = FacilityMember.builder()
+                .facility(saveFacility)
+                .userId(request.getCreatorId())
+                .role(request.getUserRole())
+                .build();
+        facilityMemberRepository.save(member);
+
+
+        FacilityCreatedEvent event = new FacilityCreatedEvent(
+                UUID.randomUUID(),
+                request.getCreatorId(),
+                facility.getId(),
+                facility.getName(),
+                facility.getType().name(),
+                LocalDateTime.now()
+        );
+
+        kafkaProducer.facilityCreationEvent(event);
+
+        return saveFacility;
+    }
 }

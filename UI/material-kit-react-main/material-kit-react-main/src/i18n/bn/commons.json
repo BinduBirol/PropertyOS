@@ -63,7 +63,7 @@
     "cancel": "বাতিল",
     "delete": "মুছুন",
     "loading": "লোড হচ্ছে...",
-    "processing" : "প্রক্রিয়াধীন...",
+    "processing": "প্রক্রিয়াধীন...",
     "or": "অথবা",
     "serverUnavailable": "সার্ভারের সাথে সংযোগ স্থাপন করা যায়নি।",
     "somethingWentWrong": "কিছু ভুল হয়েছে।",
@@ -115,7 +115,30 @@
     "invalidEmail": "অকার্যকর ইমেইল ঠিকানা",
     "phoneRequired": "ফোন নম্বর প্রয়োজন",
     "passwordRequired": "পাসওয়ারড প্রয়োজন",
-    "passwordMinLength": "পাসওয়ার্ড কমপক্ষে 8 অক্ষরের হতে হবে"
+    "passwordMinLength": "পাসওয়ার্ড কমপক্ষে 8 অক্ষরের হতে হবে",
+
+    "stepPersonalInfo": "ব্যক্তিগত তথ্য",
+    "stepFacilityInfo": "প্রতিষ্ঠানের তথ্য",
+
+    "facilityTitle": "প্রতিষ্ঠানের নাম",
+    "facilityTitleRequired": "প্রতিষ্ঠানের নাম আবশ্যক",
+
+    "facilityType": "প্রতিষ্ঠানের ধরন",
+    "facilityTypeRequired": "প্রতিষ্ঠানের ধরন আবশ্যক",
+
+    "roleRequired": "ভূমিকা আবশ্যক",
+
+    "addressLine1": "ঠিকানা লাইন ১",
+    "addressLine1Required": "ঠিকানা লাইন ১ আবশ্যক",
+
+    "description": "বিবরণ",
+
+    "back": "পূর্ববর্তী",
+    "next": "পরবর্তী",
+    "fieldRequired": "এই ক্ষেত্রটি আবশ্যক",
+    "invalidValue": "অবৈধ মান",
+    "tooShort": "কমপক্ষে {{min}} অক্ষর হতে হবে",
+    "tooLong": "সর্বোচ্চ {{max}} অক্ষর হতে পারে"
   },
   "otp": {
     "title": "অ্যাকাউন্ট যাচাই করুন",

@@ -105,4 +105,11 @@ public class FacilityDto {
             accessMode = Schema.AccessMode.READ_ONLY
     )
     private UUID id;
+
+    @Schema(
+            description = "ID of the user who created the facility",
+            example = "1001",
+            accessMode = Schema.AccessMode.READ_ONLY
+    )
+    private Long creatorId;
 }

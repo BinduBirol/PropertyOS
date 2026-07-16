@@ -63,6 +63,7 @@
     "cancel": "Cancel",
     "delete": "Delete",
     "loading": "Loading...",
+    "processing": "Processing...",
     "or": "OR",
     "serverUnavailable": "Unable to connect to the server.",
     "somethingWentWrong": "Something went wrong.",
@@ -114,7 +115,32 @@
     "invalidEmail": "Invalid email address",
     "phoneRequired": "Phone number is required",
     "passwordRequired": "Password is required",
-    "passwordMinLength": "Password must be at least 8 characters long"
+    "passwordMinLength": "Password must be at least 8 characters long",
+
+    "stepPersonalInfo": "Personal Information",
+    "stepFacilityInfo": "Facility Information",
+
+    "facilityTitle": "Facility Title",
+    "facilityTitleRequired": "Facility title is required",
+
+    "facilityType": "Facility Type",
+    "facilityTypeRequired": "Facility type is required",
+
+
+    "roleRequired": "Role is required",
+
+    "addressLine1": "Address Line 1",
+    "addressLine1Required": "Address line 1 is required",
+
+    "description": "Description",
+
+    "back": "Back",
+    "next": "Next",
+
+    "fieldRequired": "This field is required",
+    "invalidValue": "Invalid value",
+    "tooShort": "Must be at least {{min}} characters",
+    "tooLong": "Must be at most {{max}} characters"
   },
   "otp": {
     "title": "Verify Account",

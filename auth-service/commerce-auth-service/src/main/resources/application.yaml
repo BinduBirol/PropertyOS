@@ -77,3 +77,8 @@ spring doc:
 password:
   token:
     expiration: 300000
+
+
+services:
+  property:
+    base-url: http://localhost:8082/property

@@ -2,13 +2,15 @@ import { useCallback, useMemo, useState } from 'react';
 
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
+import GlobalStyles from '@mui/material/GlobalStyles';
 import Link from '@mui/material/Link';
-import TextField from '@mui/material/TextField';
+import Step from '@mui/material/Step';
+import StepLabel from '@mui/material/StepLabel';
+import Stepper from '@mui/material/Stepper';
 import Typography from '@mui/material/Typography';
 
-import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
+import { FormProvider, useForm } from 'react-hook-form';
 
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
@@ -18,9 +20,27 @@ import { RouterLink } from 'src/routes/components/router-link';
 import { register } from 'src/api/authApi';
 import AlertDialog from 'src/components/dialog/AlertDialog';
 import SocialLogin from 'src/components/auth/SocialLogin';
+import { buildRegisterSchema, RegisterForm, STEP_FIELDS } from './register/register-schema';
+import { PersonalInfoForm } from './register/personal-info-form';
+import { FacilityInfoForm } from './register/facility-info-form';
 
 
-// ----------------------------------------------------------------------
+const autofillStyles = (
+    <GlobalStyles
+        styles={{
+            '@keyframes mui-auto-fill': { from: { opacity: 1 }, to: { opacity: 1 } },
+            '@keyframes mui-auto-fill-cancel': { from: { opacity: 1 }, to: { opacity: 1 } },
+            'input:-webkit-autofill': {
+                animationName: 'mui-auto-fill',
+                animationDuration: '0.001s',
+            },
+            'input:not(:-webkit-autofill)': {
+                animationName: 'mui-auto-fill-cancel',
+                animationDuration: '0.001s',
+            },
+        }}
+    />
+);
 
 export function RegisterView() {
 
@@ -29,61 +49,64 @@ export function RegisterView() {
     const { enqueueSnackbar } = useSnackbar();
 
     const [loading, setLoading] = useState(false);
+    const [activeStep, setActiveStep] = useState(0);
 
     const [successDialogOpen, setSuccessDialogOpen] = useState(false);
     const [successMessage, setSuccessMessage] = useState('');
     const [verifyUserId, setVerifyUserId] = useState<string>('');
 
+    const steps = useMemo(
+        () => [t('register.stepPersonalInfo'), t('register.stepFacilityInfo')],
+        [t]
+    );
 
-    const schema = useMemo(() => z.object({
-
-        firstName: z
-            .string()
-            .min(1, t('register.firstNameRequired')),
-
-        lastName: z
-            .string()
-            .min(1, t('register.lastNameRequired')),
-
-        email: z
-            .string()
-            .min(1, t('register.emailRequired'))
-            .email(t('register.invalidEmail')),
-
-        phone: z
-            .string()
-            .min(1, t('register.phoneRequired')),
-
-        password: z
-            .string()
-            .min(1, t('register.passwordRequired'))
-            .min(8, t('register.passwordMinLength')),
-
-    }), [t]);
+    const schema = useMemo(() => buildRegisterSchema(t), [t]);
 
 
-    type RegisterForm = z.infer<typeof schema>;
-
-
-    const {
-        register: registerField,
-        handleSubmit,
-        formState: { errors },
-    } = useForm<RegisterForm>({
+    const methods = useForm<RegisterForm>({
         resolver: zodResolver(schema),
+        mode: 'onChange',
+        reValidateMode: 'onChange',
         defaultValues: {
             firstName: '',
             lastName: '',
             email: '',
             phone: '',
             password: '',
+            facilityTitle: '',
+            facilityType: '',
+            role: 'OWNER',
+            addressLine1: '',
+            description: '',
         },
     });
 
+    const { handleSubmit, trigger } = methods;
+
+
+    const handleNext = useCallback(async () => {
+        console.log('NEXT CLICKED');
+
+        const fields = STEP_FIELDS[activeStep];
+        const valid = await trigger(fields as readonly (keyof RegisterForm)[]);
+
+        console.log('VALID:', valid);
+
+        if (valid) {
+            setActiveStep((prev) => prev + 1);
+        }
+    }, [activeStep, trigger]);
+
+
+    const handleBack = useCallback(() => {
+        setActiveStep((prev) => prev - 1);
+    }, []);
 
 
     const handleRegister = useCallback(
         async (data: RegisterForm) => {
+
+            console.log('REGISTER SUBMITTED');
 
             try {
 
@@ -92,7 +115,6 @@ export function RegisterView() {
 
                 const response = await register({
                     ...data,
-                    role: "OWNER",
                 });
 
 
@@ -160,7 +182,6 @@ export function RegisterView() {
     );
 
 
-
     const renderForm = (
 
         <Box
@@ -173,76 +194,58 @@ export function RegisterView() {
             }}
         >
 
-
-            <TextField
-                fullWidth
-                label={t('register.firstName')}
-                {...registerField('firstName')}
-                error={!!errors.firstName}
-                helperText={errors.firstName?.message}
-                sx={{ mb: 3 }}
-            />
+            <Box sx={{ width: '100%' }}>
+                {activeStep === 0 && <PersonalInfoForm />}
+                {activeStep === 1 && <FacilityInfoForm />}
+            </Box>
 
 
-            <TextField
-                fullWidth
-                label={t('register.lastName')}
-                {...registerField('lastName')}
-                error={!!errors.lastName}
-                helperText={errors.lastName?.message}
-                sx={{ mb: 3 }}
-            />
-
-
-            <TextField
-                fullWidth
-                label={t('auth.emailAddress')}
-                {...registerField('email')}
-                error={!!errors.email}
-                helperText={errors.email?.message}
-                sx={{ mb: 3 }}
-            />
-
-
-            <TextField
-                fullWidth
-                label={t('auth.mobileNumber')}
-                {...registerField('phone')}
-                error={!!errors.phone}
-                helperText={errors.phone?.message}
-                sx={{ mb: 3 }}
-            />
-
-
-            <TextField
-                fullWidth
-                type="password"
-                label={t('auth.password')}
-                {...registerField('password')}
-                error={!!errors.password}
-                helperText={errors.password?.message}
-                sx={{ mb: 3 }}
-            />
-
-
-
-            <Button
-                fullWidth
-                size="large"
-                variant="contained"
-                color="primary"
-                disabled={loading}
-                type="submit"
+            <Box
+                sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    width: '100%',
+                    gap: 2,
+                }}
             >
 
-                {
-                    loading
-                        ? t('register.loading')
-                        : t('register.submit')
-                }
+                <Button
+                    type="button"
+                    size="large"
+                    disabled={activeStep === 0 || loading}
+                    onClick={handleBack}
+                >
+                    {t('register.back')}
+                </Button>
 
-            </Button>
 
+                <Button
+                    type="button"
+                    size="large"
+                    variant="outlined"
+                    color="primary"
+                    onClick={handleNext}
+                    sx={{
+                        display: activeStep < steps.length - 1 ? 'inline-flex' : 'none',
+                    }}
+                >
+                    {t('register.next')}
+                </Button>
+
+                <Button
+                    type="submit"
+                    size="large"
+                    variant="contained"
+                    color="primary"
+                    disabled={loading}
+                    sx={{
+                        display: activeStep === steps.length - 1 ? 'inline-flex' : 'none',
+                    }}
+                >
+                    {loading ? t('register.loading') : t('register.submit')}
+                </Button>
+
+            </Box>
 
         </Box>
 
@@ -253,6 +256,8 @@ export function RegisterView() {
     return (
 
         <>
+
+            {autofillStyles}
 
             <Box
                 sx={{
@@ -291,9 +296,20 @@ export function RegisterView() {
             </Box>
 
 
-            {renderForm}
+            <Stepper activeStep={activeStep} sx={{ width: '100%', mb: 5 }}>
+                {steps.map((label) => (
+                    <Step key={label}>
+                        <StepLabel>{label}</StepLabel>
+                    </Step>
+                ))}
+            </Stepper>
 
-            <SocialLogin />
+
+            <FormProvider {...methods}>
+                {renderForm}
+            </FormProvider>
+
+
 
             <AlertDialog
                 open={successDialogOpen}

@@ -1,7 +1,10 @@
 package com.bnroll.auth.dto;
 
+import com.bnroll.commercedomain.enums.user.RoleName;
+import com.bnroll.dto.property.FacilityType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -47,17 +50,37 @@ public class RegisterRequest {
 
     @Schema(
             description = "Role assigned to the user",
-            allowableValues = {
-                    "SUPER_ADMIN",
-                    "OWNER",
-                    "PROPERTY_MANAGER",
-                    "ACCOUNTANT",
-                    "SECURITY_GUARD",
-                    "MAINTENANCE_STAFF",
-                    "TENANT"
-            },
             example = "OWNER"
     )
-    @NotBlank(message = "{role.required}")
-    private String role;
+    @NotNull(message = "{role.required}")
+    private RoleName role;
+
+
+    @Schema(
+            description = "Facility title",
+            example = "Green View Apartments"
+    )
+    @NotBlank(message = "{facilityTitle.required}")
+    private String facilityTitle;
+
+    @Schema(
+            description = "Type of facility",
+
+            example = "RESIDENTIAL"
+    )
+    @NotNull(message = "{facilityType.required}")
+    private FacilityType facilityType;
+
+    @Schema(
+            description = "Facility address line 1",
+            example = "House 12, Road 5, Banani"
+    )
+    @NotBlank(message = "{addressLine1.required}")
+    private String addressLine1;
+
+    @Schema(
+            description = "Facility description",
+            example = "A 20-bed diagnostic center offering pathology and imaging services"
+    )
+    private String description;
 }
