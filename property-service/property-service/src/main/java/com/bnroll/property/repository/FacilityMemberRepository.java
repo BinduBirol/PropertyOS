@@ -7,6 +7,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface FacilityMemberRepository extends CrudRepository<FacilityMember, UUID> {
@@ -18,4 +19,9 @@ public interface FacilityMemberRepository extends CrudRepository<FacilityMember,
                 where fm.userId = :userId
             """)
     List<FacilityMember> findByUserId(@Param("userId") Long userId);
+
+    Optional<FacilityMember> findByUserIdAndFacility_Id(Long userId, UUID facilityId);
+
+
+    void deleteByUserIdAndFacility_Id(Long id, UUID facilityId);
 }

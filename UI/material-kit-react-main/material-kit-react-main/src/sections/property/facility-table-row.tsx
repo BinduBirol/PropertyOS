@@ -14,6 +14,8 @@ import { Iconify } from 'src/components/iconify';
 
 import type { Facility } from 'src/types/property/facility';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import { RouterLink } from 'src/routes/components';
 
 // ----------------------------------------------------------------------
 
@@ -30,6 +32,8 @@ export function FacilityTableRow({
 }: FacilityTableRowProps) {
 
     const { t } = useTranslation();
+
+    const navigate = useNavigate();
 
     const [openPopover, setOpenPopover] =
         useState<HTMLButtonElement | null>(null);
@@ -53,25 +57,33 @@ export function FacilityTableRow({
                 </TableCell>
 
                 <TableCell component="th" scope="row">
-                    <Box
-                        sx={{
-                            display: 'flex',
-                            flexDirection: 'column',
+                    <RouterLink
+                        href={`/property/facility/view/${row.id}`}
+                        style={{
+                            textDecoration: 'none',
+                            color: 'inherit',
                         }}
                     >
-                        <Box sx={{ fontWeight: 600 }}>
-                            {row.name}
-                        </Box>
-
                         <Box
                             sx={{
-                                typography: 'caption',
-                                color: 'text.secondary',
+                                display: 'flex',
+                                flexDirection: 'column',
                             }}
                         >
-                            {row.addressLine1}
+                            <Box sx={{ fontWeight: 600 }}>
+                                {row.name}
+                            </Box>
+
+                            <Box
+                                sx={{
+                                    typography: 'caption',
+                                    color: 'text.secondary',
+                                }}
+                            >
+                                {row.addressLine1}
+                            </Box>
                         </Box>
-                    </Box>
+                    </RouterLink>
                 </TableCell>
 
                 <TableCell>{t(`facilityType.${row.type}`)}</TableCell>
@@ -124,28 +136,27 @@ export function FacilityTableRow({
                         },
                     }}
                 >
-                    <MenuItem onClick={handleClosePopover}>
+                    <MenuItem
+                        onClick={() => {
+                            handleClosePopover();
+                            navigate(`/property/facility/edit/${row.id}/edit`);
+                        }}
+                    >
                         <Iconify icon="solar:pen-bold" />
-                        Edit
-                    </MenuItem>
-
-                    <MenuItem onClick={handleClosePopover}>
-                        <Iconify icon="carbon:chevron-sort" />
-                        Members
-                    </MenuItem>
-
-                    <MenuItem onClick={handleClosePopover}>
-                        <Iconify icon="custom:menu-duotone" />
-                        Settings
+                        {t('common.edit')}
                     </MenuItem>
 
                     <MenuItem
-                        onClick={handleClosePopover}
-                        sx={{ color: 'error.main' }}
+                        onClick={() => {
+                            handleClosePopover();
+                            navigate(`/property/facility/view/${row.id}`);
+                        }}
                     >
-                        <Iconify icon="solar:trash-bin-trash-bold" />
-                        Delete
+                        <Iconify icon="solar:settings-bold-duotone" />
+                        {t('common.details')}
                     </MenuItem>
+
+
                 </MenuList>
             </Popover>
         </>

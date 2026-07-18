@@ -29,6 +29,9 @@ export const MyFacilityPage = lazy(() => import('src/pages/property/facility-lis
 
 export const ForgotPasswordPage = lazy(() => import('src/pages/password/forgot-password'));
 
+export const FacilityViewPage = lazy(() => import('src/pages/property/facility-view'));
+export const FacilityEditPage = lazy(() => import('src/pages/property/facility-edit-view'));
+
 const renderFallback = () => (
   <Box
     sx={{
@@ -67,6 +70,14 @@ export const routesSection: RouteObject[] = [
       { path: 'blog', element: <BlogPage /> },
       { path: 'property/facility/create', element: <CreateFacilityPage /> },
       { path: 'property/facility/list', element: <MyFacilityPage /> },
+      {
+        path: 'property/facility/view/:id',
+        element: <FacilityViewPage />,
+      },
+      {
+        path: 'property/facility/edit/:id',
+        element: <FacilityEditPage />,
+      }
 
     ],
   },

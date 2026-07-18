@@ -1,6 +1,7 @@
 package com.bnroll.property.service;
 
 import com.bnroll.commercedomain.enums.billing.Feature;
+import com.bnroll.commercedomain.enums.user.RoleName;
 import com.bnroll.commercedomain.event.property.FacilityCreatedEvent;
 import com.bnroll.commercedomain.exception.BillingException;
 import com.bnroll.commercedomain.exception.PropertyException;
@@ -17,9 +18,11 @@ import com.bnroll.property.repository.FacilityRepository;
 import com.bnroll.property.security.JwtService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestClientException;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -146,8 +149,9 @@ public class FacilityService {
         EntitlementDto entitlement;
 
         try {
-            entitlement = billingClient.checkFeature(feature, workspaceId, user.id());
-        } catch (Exception e) {
+            entitlement = billingClient.checkFeatureAccess(feature, workspaceId, user.id());
+        } catch (RestClientException ex) {
+            System.err.println("Error form billing-service : " + ex.getMessage());
             throw new PropertyException(
                     "error.billing.service.unavailable",
                     HttpStatus.SERVICE_UNAVAILABLE
@@ -185,5 +189,66 @@ public class FacilityService {
                     feature.name()
             );
         }
+    }
+
+    @Transactional
+    public void deleteFacility(UUID facilityId, UserPrincipal user) {
+
+        FacilityMember facilityMember = facilityMemberRepository
+                .findByUserIdAndFacility_Id(user.id(), facilityId)
+                .orElseThrow(() -> new PropertyException(
+                        "error.facility.delete.not_authorized",
+                        HttpStatus.FORBIDDEN
+                ));
+
+        RoleName role = facilityMember.getRole();
+
+        if (role != RoleName.OWNER && role != RoleName.PROPERTY_MANAGER) {
+            throw new PropertyException(
+                    "error.facility.delete.not_authorized",
+                    HttpStatus.FORBIDDEN
+            );
+        }
+
+        try {
+            facilityMemberRepository.deleteByUserIdAndFacility_Id(user.id(), facilityId);
+            facilityRepository.deleteById(facilityId);
+        } catch (DataIntegrityViolationException ex) {
+            throw new PropertyException(
+                    "error.facility.delete.failed.in_use",
+                    HttpStatus.CONFLICT
+            );
+        }
+    }
+
+    @Transactional(readOnly = true)
+    public FacilityDto getFacility(UUID id, UserPrincipal user) {
+
+        Facility facility = facilityRepository.findById(id)
+                .orElseThrow(() -> new PropertyException(
+                        "error.facility.not_found",
+                        HttpStatus.NOT_FOUND
+                ));
+
+        FacilityMember facilityMember = facilityMemberRepository
+                .findByUserIdAndFacility_Id(user.id(), id)
+                .orElseThrow(() -> new PropertyException(
+                        "error.facility.not_found",
+                        HttpStatus.FORBIDDEN
+                ));
+
+        return FacilityDto.builder()
+                .id(facility.getId())
+                .name(facility.getName())
+                .type(facility.getType())
+                .addressLine1(facility.getAddressLine1())
+                .addressLine2(facility.getAddressLine2())
+                .city(facility.getCity())
+                .country(facility.getCountry())
+                .postalCode(facility.getPostalCode())
+                .description(facility.getDescription())
+                .creatorId(user.id())
+                .userRole(facilityMember.getRole())
+                .build();
     }
 }

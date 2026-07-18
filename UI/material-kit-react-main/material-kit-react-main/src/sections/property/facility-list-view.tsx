@@ -36,7 +36,7 @@ import LoadingData from 'src/components/loading/loading-data';
 
 // ----------------------------------------------------------------------
 
-export function FacilityView() {
+export function FacilityListView() {
     const table = useFacilityTable();
     const { t } = useTranslation();
 

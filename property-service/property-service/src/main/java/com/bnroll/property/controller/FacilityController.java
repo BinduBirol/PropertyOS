@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @RestController
@@ -60,4 +61,44 @@ public class FacilityController {
                 .correlationId(String.valueOf(user.id()))
                 .build();
     }
+
+    @DeleteMapping("/delete/{id}")
+    public ApiResponse<String> deleteFacility(@PathVariable UUID id, HttpServletRequest httpServletRequest, Locale locale, Authentication authentication) {
+        UserPrincipal user = (UserPrincipal) authentication.getPrincipal();
+
+        facilityService.deleteFacility(id, user);
+
+        String responseMessage = messageSource.getMessage("facility.deleted", null, locale);
+        return ApiResponse.<String>builder()
+                .success(true)
+                .data(responseMessage)
+                .timestamp(LocalDateTime.now())
+                .version("v1")
+                .path(httpServletRequest.getRequestURI())
+                .correlationId(String.valueOf(id))
+                .build();
+    }
+
+    @GetMapping("/get/{id}")
+    public ApiResponse<FacilityDto> getFacility(
+            @PathVariable UUID id,
+            HttpServletRequest request,
+            Locale locale,
+            Authentication authentication) {
+
+        UserPrincipal user = (UserPrincipal) authentication.getPrincipal();
+
+        FacilityDto facility = facilityService.getFacility(id, user);
+
+        return ApiResponse.<FacilityDto>builder()
+                .success(true)
+                .data(facility)
+                .timestamp(LocalDateTime.now())
+                .version("v1")
+                .path(request.getRequestURI())
+                .correlationId(UUID.randomUUID().toString())
+                .build();
+    }
+
+
 }

@@ -37,3 +37,16 @@ export async function createFacility(data: Facility): Promise<ApiResponse<string
 
   return response.data;
 }
+
+export async function getFacility(id: string): Promise<ApiResponse<Facility>> {
+  const response = await propertyAxios.get<ApiResponse<Facility>>(`/facility/get/${id}`);
+
+  return response.data;
+}
+
+export async function deleteFacility(id: string): Promise<ApiResponse<string>> {
+  const response = await propertyAxios.delete<ApiResponse<string>>(`/facility/delete/${id}`);
+
+  return response.data;
+}
+
